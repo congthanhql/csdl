@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản Lý Dự Án</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ===== CSS VARIABLES ===== */
+:root {
+  --bg: #f4f6f9;
+  --bg2: #eaecf0;
+  --surface: #ffffff;
+  --surface2: #f0f2f5;
+  --border: #dde1e8;
+  --border2: #c8cdd8;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: rgba(37,99,235,0.08);
+  --accent2: #7c3aed;
+  --green: #16a34a;
+  --green-soft: rgba(22,163,74,0.09);
+  --red: #dc2626;
+  --red-soft: rgba(220,38,38,0.08);
+  --yellow: #d97706;
+  --text: #111827;
+  --text2: #4b5563;
+  --text3: #9ca3af;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+  --radius: 12px;
+  --transition: 0.22s ease;
+}
+
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --surface: #161b22;
+  --surface2: #21262d;
+  --border: #30363d;
+  --border2: #444c56;
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-soft: rgba(59,130,246,0.12);
+  --accent2: #a78bfa;
+  --green: #4ade80;
+  --green-soft: rgba(74,222,128,0.1);
+  --red: #f87171;
+  --red-soft: rgba(248,113,113,0.1);
+  --yellow: #fbbf24;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #6e7681;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow: 0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  line-height: 1.5;
+}
+
+/* Grid pattern for dark mode */
+[data-theme="dark"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Light mode subtle pattern */
+[data-theme="light"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+/* ===== LOGIN SCREEN ===== */
+#login-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  transition: background var(--transition);
+}
+
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 44px 40px 36px;
+  width: 420px;
+  max-width: 94vw;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  z-index: 1;
+  animation: slideUp 0.4s cubic-bezier(0.34,1.3,0.64,1) both;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 24px; right: 24px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 0 0 4px 4px;
+}
+
+.login-head {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-icon {
+  width: 60px; height: 60px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin-bottom: 14px;
+  box-shadow: 0 6px 24px rgba(37,99,235,0.3);
+}
+
+.login-head h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text);
+}
+
+.login-head p {
+  font-size: 13px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+/* Theme toggle on login page */
+.login-theme-btn {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all var(--transition);
+}
+
+.login-theme-btn:hover { border-color: var(--accent); }
+
+/* Fields */
+.form-field { margin-bottom: 18px; }
+
+.form-field label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 7px;
+}
+
+.form-field input {
+  width: 100%;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  padding: 11px 14px;
+  color: var(--text);
+  font-family: 'Quicksand', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.form-field input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  background: var(--surface);
+}
+
+.btn-login {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  color: #fff;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: opacity var(--transition), transform 0.1s, box-shadow var(--transition);
+  margin-top: 6px;
+  box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-login:hover { opacity: 0.92; box-shadow: 0 6px 20px rgba(37,99,235,0.45); }
+.btn-login:active { transform: scale(0.98); }
+
+.login-error {
+  display: none;
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--red-soft);
+  border: 1px solid rgba(220,38,38,0.25);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--red);
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Loading spinner */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== MAIN APP ===== */
+#app {
+  display: none;
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* HEADER */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+}
+
+.brand-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text);
+}
+
+.brand-name span { color: var(--accent); }
+
+.firebase-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,160,0,0.1);
+  border: 1px solid rgba(255,160,0,0.25);
+  border-radius: 20px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #f59e0b;
+  letter-spacing: 0.3px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Theme toggle */
+.theme-toggle {
+  width: 38px; height: 22px;
+  background: var(--border2);
+  border-radius: 11px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: background var(--transition);
+  flex-shrink: 0;
+}
+
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform var(--transition);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+[data-theme="dark"] .theme-toggle { background: var(--accent); }
+[data-theme="dark"] .theme-toggle::after { transform: translateX(16px); }
+
+.theme-label {
+  font-size: 12px;
+  color: var(--text3);
+  font-weight: 600;
+  min-width: 34px;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 11px 4px 5px;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.user-avatar {
+  width: 24px; height: 24px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.user-email {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-logout {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 5px 12px;
+  color: var(--text2);
+  font-family: 'Quicksand', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+/* MAIN */
+.main {
+  padding: 28px 28px 48px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover { box-shadow: var(--shadow); }
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 16px; bottom: 16px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+}
+
+.stat-card:nth-child(1)::before { background: var(--accent); }
+.stat-card:nth-child(2)::before { background: var(--green); }
+.stat-card:nth-child(3)::before { background: var(--accent2); }
+
+.stat-icon { font-size: 20px; margin-bottom: 8px; }
+.stat-label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.7px; }
+.stat-value {
+  font-size: 30px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -1.5px;
+  line-height: 1;
+  margin-top: 4px;
+}
+.stat-card:nth-child(1) .stat-value { color: var(--accent); }
+.stat-card:nth-child(2) .stat-value { color: var(--green); }
+.stat-card:nth-child(3) .stat-value { color: var(--accent2); font-size: 14px; letter-spacing: 0; line-height: 1.4; font-family: 'Quicksand', sans-serif; font-weight: 700; }
+
+/* TOOLBAR */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.toolbar-title {
+  font-size: 17px;
+  font-weight: 700;
+  flex: 1;
+  min-width: 120px;
+  color: var(--text);
+}
+
+.search-box {
+  position: relative;
+}
+
+.search-box input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 9px 13px 9px 36px;
+  color: var(--text);
+  font-family: 'Quicksand', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  width: 210px;
+  outline: none;
+  transition: all var(--transition);
+}
+
+.search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 14px; pointer-events: none; }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 15px;
+  border-radius: 9px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
+.btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 14px rgba(37,99,235,0.4); }
+
+.btn-ghost { background: var(--surface); border-color: var(--border); color: var(--text2); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+.btn-green { background: var(--surface); border-color: var(--green); color: var(--green); }
+.btn-green:hover { background: var(--green-soft); }
+
+/* TABLE */
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.table-wrap { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; min-width: 560px; }
+
+thead tr {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+
+th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+}
+
+th.col-stt { width: 64px; text-align: center; }
+th.col-actions { text-align: right; width: 90px; }
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--accent-soft); }
+
+td { padding: 13px 16px; font-size: 14px; vertical-align: middle; }
+
+td.col-stt {
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text3);
+}
+
+.product-name { font-weight: 700; color: var(--text); }
+
+.gmail-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(37,99,235,0.2);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+[data-theme="dark"] .gmail-tag {
+  border-color: rgba(59,130,246,0.3);
+}
+
+.date-tag {
+  font-size: 12px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.actions { display: flex; gap: 5px; justify-content: flex-end; }
+
+.btn-icon {
+  width: 30px; height: 30px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text2);
+  transition: all var(--transition);
+}
+
+.btn-icon.edit:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.btn-icon.del:hover  { border-color: var(--red); color: var(--red); background: var(--red-soft); }
+
+/* Empty / Loading */
+.center-msg {
+  text-align: center;
+  padding: 56px 20px;
+  color: var(--text3);
+}
+
+.center-msg .msg-icon { font-size: 36px; margin-bottom: 10px; opacity: 0.5; }
+.center-msg p { font-size: 14px; font-weight: 600; }
+.center-msg small { font-size: 12px; }
+
+/* Loading skeleton */
+.skeleton-row td { padding: 12px 16px; }
+.skeleton-bar {
+  height: 14px;
+  background: linear-gradient(90deg, var(--border) 25%, var(--border2) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  border-radius: 7px;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* Firebase status */
+.fb-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-top: 1px solid var(--border);
+  color: var(--text3);
+  background: var(--surface2);
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.fb-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--text3);
+  flex-shrink: 0;
+}
+
+.fb-dot.ok { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.fb-dot.err { background: var(--red); }
+.fb-dot.loading { background: var(--yellow); animation: pulse 1s infinite; }
+
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 30px;
+  width: 460px;
+  max-width: 94vw;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(18px) scale(0.97);
+  transition: transform 0.25s cubic-bezier(0.34,1.2,0.64,1), background var(--transition), border-color var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+.modal::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+}
+
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.modal-title { font-size: 17px; font-weight: 700; }
+
+.modal-close {
+  width: 30px; height: 30px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  font-size: 15px;
+  transition: all var(--transition);
+}
+
+.modal-close:hover { color: var(--red); border-color: var(--red); }
+
+.modal-footer {
+  display: flex;
+  gap: 9px;
+  justify-content: flex-end;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  z-index: 300;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34,1.4,0.64,1);
+  pointer-events: none;
+  max-width: 300px;
+}
+
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: var(--green); }
+.toast.success .ti { color: var(--green); }
+.toast.error { border-color: var(--red); }
+.toast.error .ti { color: var(--red); }
+.toast.info { border-color: var(--accent); }
+.toast.info .ti { color: var(--accent); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  .main { padding: 16px 14px 40px; }
+  .header { padding: 0 14px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .stats-grid .stat-card:nth-child(3) { grid-column: span 2; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .search-box input { width: 100%; }
+  .user-email { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <button class="login-theme-btn" onclick="toggleTheme()" id="login-theme-btn" title="Đổi giao diện">☀️</button>
+    <div class="login-head">
+      <div class="login-icon">📋</div>
+      <h1>Quản Lý Dự Án</h1>
+      <p>Đăng nhập để tiếp tục làm việc</p>
+    </div>
+    <div class="form-field">
+      <label>Gmail</label>
+      <input type="email" id="inp-email" placeholder="example@gmail.com" autocomplete="off">
+    </div>
+    <div class="form-field">
+      <label>Mật Khẩu</label>
+      <input type="password" id="inp-pass" placeholder="••••••••">
+    </div>
+    <button class="btn-login" id="btn-login-submit" onclick="doLogin()">
+      <span class="spinner" id="login-spinner"></span>
+      <span id="login-btn-text">🔑 Đăng Nhập</span>
+    </button>
+    <div class="login-error" id="login-error">❌ Gmail hoặc mật khẩu không đúng!</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header class="header">
+    <div class="brand">
+      <div class="brand-icon">📋</div>
+      <div class="brand-name">Project<span>Hub</span></div>
+      <span class="firebase-pill">🔥 Firebase</span>
+    </div>
+    <div class="header-right">
+      <span class="theme-label" id="theme-label">Sáng</span>
+      <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Đổi giao diện sáng/tối"></button>
+      <div class="user-chip">
+        <div class="user-avatar" id="user-initial">B</div>
+        <span class="user-email" id="user-email-display">...</span>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Đăng Xuất</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-label">Tổng Sản Phẩm</div>
+        <div class="stat-value" id="stat-total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-label">Quản Lý Duy Nhất</div>
+        <div class="stat-value" id="stat-managers">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🕒</div>
+        <div class="stat-label">Cập Nhật Gần Nhất</div>
+        <div class="stat-value" id="stat-updated">—</div>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-title">📦 Danh Sách Sản Phẩm</div>
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-inp" placeholder="Tìm kiếm sản phẩm / Gmail..." oninput="renderTable()">
+      </div>
+      <button class="btn btn-green" onclick="exportCSV()">⬇ CSV</button>
+      <button class="btn btn-green" onclick="exportJSON()">⬇ JSON</button>
+      <button class="btn btn-primary" onclick="openModal()">＋ Thêm Sản Phẩm</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-stt">#</th>
+              <th>Tên Sản Phẩm</th>
+              <th>Gmail Quản Lý</th>
+              <th>Ngày Tạo</th>
+              <th class="col-actions">Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <!-- loading skeleton -->
+            <tr class="skeleton-row"><td class="col-stt"><div class="skeleton-bar" style="width:24px;margin:auto"></div></td><td><div class="skeleton-bar" style="width:60%"></div></td><td><div class="skeleton-bar" style="width:75%"></div></td><td><div class="skeleton-bar" style="width:50%"></div></td><td></td></tr>
+            <tr class="skeleton-row"><td class="col-stt"><div class="skeleton-bar" style="width:24px;margin:auto"></div></td><td><div class="skeleton-bar" style="width:45%"></div></td><td><div class="skeleton-bar" style="width:80%"></div></td><td><div class="skeleton-bar" style="width:40%"></div></td><td></td></tr>
+          </tbody>
+        </table>
+        <div id="empty-state" class="center-msg" style="display:none">
+          <div class="msg-icon">📭</div>
+          <p>Chưa có sản phẩm nào</p>
+          <small>Nhấn <strong>Thêm Sản Phẩm</strong> để bắt đầu</small>
+        </div>
+      </div>
+      <div class="fb-status">
+        <div class="fb-dot loading" id="fb-dot"></div>
+        <span id="fb-status-text">Đang kết nối Firebase...</span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Thêm Sản Phẩm</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label>Tên Sản Phẩm <span style="color:var(--red)">*</span></label>
+        <input type="text" id="field-name" placeholder="Nhập tên sản phẩm...">
+      </div>
+      <div class="form-field">
+        <label>Gmail Quản Lý <span style="color:var(--red)">*</span></label>
+        <input type="email" id="field-gmail" placeholder="manager@gmail.com">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Hủy</button>
+      <button class="btn btn-primary" id="btn-save" onclick="saveProduct()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="ti" id="toast-icon">✓</span>
+  <span id="toast-msg">OK</span>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getDatabase, ref, push, set, remove, onValue, update
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDtAU-Iqn-u39_mgkxRZ3fIF_Kyxqn-Gyg",
+    authDomain: "csdl-bio.firebaseapp.com",
+    databaseURL: "https://csdl-bio-default-rtdb.firebaseio.com",
+    projectId: "csdl-bio",
+    storageBucket: "csdl-bio.firebasestorage.app",
+    messagingSenderId: "568258817515",
+    appId: "1:568258817515:web:777ae136b09d0bf0a63dae",
+    measurementId: "G-DVKHEMZVH5"
+  };
+
+  const fbApp = initializeApp(firebaseConfig);
+  const db    = getDatabase(fbApp);
+  const PRODUCTS_REF = ref(db, 'products');
+
+  // ---- expose to global scope ----
+  window._fb = { db, ref, push, set, remove, onValue, update, PRODUCTS_REF };
+
+  // ---- realtime listener ----
+  onValue(PRODUCTS_REF, (snapshot) => {
+    const data = snapshot.val();
+    window._productsCache = data ? Object.entries(data).map(([id, v]) => ({ id, ...v })) : [];
+    window._productsCache.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    renderTable();
+    setFbStatus('ok', 'Đã kết nối Firebase ✓');
+  }, (error) => {
+    setFbStatus('err', 'Lỗi kết nối: ' + error.message);
+  });
+
+  function setFbStatus(state, msg) {
+    const dot  = document.getElementById('fb-dot');
+    const text = document.getElementById('fb-status-text');
+    dot.className = 'fb-dot ' + state;
+    text.textContent = msg;
+  }
+
+  window.setFbStatus = setFbStatus;
+</script>
+
+<script>
+  // ===== THEME =====
+  const THEME_KEY = 'pjhub_theme';
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    const isDark = theme === 'dark';
+    const label  = document.getElementById('theme-label');
+    const loginBtn = document.getElementById('login-theme-btn');
+    if (label)    label.textContent = isDark ? 'Tối' : 'Sáng';
+    if (loginBtn) loginBtn.textContent = isDark ? '🌙' : '☀️';
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'light' ? 'dark' : 'light');
+  }
+
+  // Init theme (default = light)
+  applyTheme(localStorage.getItem(THEME_KEY) || 'light');
+
+  // ===== AUTH =====
+  const VALID_EMAIL = 'bioverify@googlegroups.com';
+  const VALID_PASS  = 'Thanh123@';
+
+  function doLogin() {
+    const email = document.getElementById('inp-email').value.trim();
+    const pass  = document.getElementById('inp-pass').value;
+    const err   = document.getElementById('login-error');
+    const spin  = document.getElementById('login-spinner');
+    const txt   = document.getElementById('login-btn-text');
+
+    err.style.display = 'none';
+    spin.style.display = 'inline-block';
+    txt.textContent = 'Đang kiểm tra...';
+
+    setTimeout(() => {
+      if (email === VALID_EMAIL && pass === VALID_PASS) {
+        sessionStorage.setItem('auth_user', email);
+        showApp(email);
+      } else {
+        spin.style.display = 'none';
+        txt.textContent = '🔑 Đăng Nhập';
+        err.style.display = 'block';
+        document.getElementById('inp-pass').value = '';
+      }
+    }, 600);
+  }
+
+  document.getElementById('inp-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('inp-email').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-pass').focus(); });
+
+  function showApp(email) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('user-email-display').textContent = email;
+    document.getElementById('user-initial').textContent = email[0].toUpperCase();
+    // renderTable called by Firebase listener
+  }
+
+  function doLogout() {
+    sessionStorage.removeItem('auth_user');
+    location.reload();
+  }
+
+  // Auto-login
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = sessionStorage.getItem('auth_user');
+    if (saved) showApp(saved);
+  });
+
+  // ===== PRODUCT CACHE =====
+  window._productsCache = [];
+  window._editingId = null;
+
+  // ===== RENDER =====
+  function renderTable() {
+    const q = (document.getElementById('search-inp')?.value || '').toLowerCase();
+    const data = (window._productsCache || []).filter(d =>
+      !q || d.name.toLowerCase().includes(q) || d.gmail.toLowerCase().includes(q)
+    );
+
+    const tbody = document.getElementById('table-body');
+    const empty = document.getElementById('empty-state');
+
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      data.forEach((item, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="col-stt">${String(i + 1).padStart(2, '0')}</td>
+          <td><span class="product-name">${esc(item.name)}</span></td>
+          <td><span class="gmail-tag">✉ ${esc(item.gmail)}</span></td>
+          <td><span class="date-tag">${item.date || '—'}</span></td>
+          <td>
+            <div class="actions">
+              <button class="btn-icon edit" onclick="editProduct('${item.id}')" title="Sửa">✏️</button>
+              <button class="btn-icon del"  onclick="deleteProduct('${item.id}')" title="Xóa">🗑</button>
+            </div>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    updateStats(window._productsCache);
+  }
+
+  function esc(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function updateStats(data) {
+    document.getElementById('stat-total').textContent = data.length;
+    document.getElementById('stat-managers').textContent = new Set(data.map(d => d.gmail?.toLowerCase())).size;
+    if (data.length > 0) {
+      const last = [...data].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
+      document.getElementById('stat-updated').textContent = last.date || '—';
+    } else {
+      document.getElementById('stat-updated').textContent = '—';
+    }
+  }
+
+  window.renderTable = renderTable;
+
+  // ===== MODAL =====
+  function openModal(id) {
+    window._editingId = id || null;
+    document.getElementById('modal-title').textContent = id ? '✏️ Sửa Sản Phẩm' : '＋ Thêm Sản Phẩm';
+
+    if (id) {
+      const item = (window._productsCache || []).find(d => d.id === id);
+      if (item) {
+        document.getElementById('field-name').value  = item.name;
+        document.getElementById('field-gmail').value = item.gmail;
+      }
+    } else {
+      document.getElementById('field-name').value  = '';
+      document.getElementById('field-gmail').value = '';
+    }
+
+    document.getElementById('modal-overlay').classList.add('open');
+    setTimeout(() => document.getElementById('field-name').focus(), 220);
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    window._editingId = null;
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  }
+
+  async function saveProduct() {
+    const name  = document.getElementById('field-name').value.trim();
+    const gmail = document.getElementById('field-gmail').value.trim();
+
+    if (!name || !gmail) {
+      showToast('⚠️ Vui lòng điền đầy đủ!', 'error');
+      return;
+    }
+
+    const fb   = window._fb;
+    if (!fb) { showToast('⏳ Firebase chưa sẵn sàng', 'error'); return; }
+
+    const btn = document.getElementById('btn-save');
+    btn.disabled = true;
+    btn.textContent = '⏳ Đang lưu...';
+
+    const today = new Date().toLocaleDateString('vi-VN');
+
+    try {
+      if (window._editingId) {
+        const rec = fb.ref(fb.db, 'products/' + window._editingId);
+        await fb.update(rec, { name, gmail, date: today });
+        showToast('✅ Đã cập nhật!', 'success');
+      } else {
+        const newRef = fb.push(fb.PRODUCTS_REF);
+        await fb.set(newRef, { name, gmail, date: today, createdAt: Date.now() });
+        showToast('✅ Đã thêm sản phẩm!', 'success');
+      }
+      closeModal();
+    } catch (err) {
+      showToast('❌ Lỗi: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '💾 Lưu';
+    }
+  }
+
+  async function deleteProduct(id) {
+    if (!confirm('Xác nhận xóa sản phẩm này?')) return;
+    const fb = window._fb;
+    try {
+      await fb.remove(fb.ref(fb.db, 'products/' + id));
+      showToast('🗑 Đã xóa!', 'success');
+    } catch (err) {
+      showToast('❌ Lỗi xóa: ' + err.message, 'error');
+    }
+  }
+
+  function editProduct(id) { openModal(id); }
+
+  window.openModal    = openModal;
+  window.closeModal   = closeModal;
+  window.closeModalOutside = closeModalOutside;
+  window.saveProduct  = saveProduct;
+  window.deleteProduct = deleteProduct;
+  window.editProduct  = editProduct;
+
+  // ===== EXPORT =====
+  function exportCSV() {
+    const data = window._productsCache || [];
+    if (!data.length) { showToast('⚠️ Không có dữ liệu!', 'error'); return; }
+    const header = ['STT','Tên Sản Phẩm','Gmail Quản Lý','Ngày Tạo'];
+    const rows   = data.map((d, i) => [i+1, `"${d.name}"`, d.gmail, d.date]);
+    const csv    = '\uFEFF' + [header, ...rows].map(r => r.join(',')).join('\n');
+    downloadFile(csv, 'quan-ly-du-an.csv', 'text/csv;charset=utf-8');
+    showToast('⬇ Đã xuất CSV!', 'success');
+  }
+
+  function exportJSON() {
+    const data = window._productsCache || [];
+    if (!data.length) { showToast('⚠️ Không có dữ liệu!', 'error'); return; }
+    const out = data.map((d, i) => ({ stt: i+1, ten_san_pham: d.name, gmail_quan_ly: d.gmail, ngay_tao: d.date }));
+    downloadFile(JSON.stringify(out, null, 2), 'quan-ly-du-an.json', 'application/json');
+    showToast('⬇ Đã xuất JSON!', 'success');
+  }
+
+  function downloadFile(content, filename, type) {
+    const a = document.createElement('a');
+    a.href  = URL.createObjectURL(new Blob([content], { type }));
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  window.exportCSV  = exportCSV;
+  window.exportJSON = exportJSON;
+  window.toggleTheme = toggleTheme;
+  window.doLogin   = doLogin;
+  window.doLogout  = doLogout;
+
+  // ===== TOAST =====
+  let _toastTimer;
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    const icons = { success: '✓', error: '✕', info: 'ℹ' };
+    t.className = `toast ${type}`;
+    document.getElementById('toast-icon').textContent = icons[type] || '✓';
+    document.getElementById('toast-msg').textContent  = msg;
+    t.classList.add('show');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  window.showToast = showToast;
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Enter' && document.getElementById('modal-overlay').classList.contains('open')) saveProduct();
+  });
+</script>
+</body>
+</html>
