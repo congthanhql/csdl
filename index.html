@@ -27,11 +27,46 @@
       color: var(--text);
     }
 
+    /* ── Login button ── */
+    .login-btn {
+      position: fixed;
+      top: 18px;
+      right: 20px;
+      z-index: 999;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 50px;
+      text-decoration: none;
+      border: 1.5px solid rgba(255,255,255,0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.3px;
+    }
+
+    .login-btn:hover {
+      background: rgba(255,255,255,0.32);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.2);
+    }
+
+    .login-btn svg {
+      flex-shrink: 0;
+    }
+
     header {
       background: linear-gradient(135deg, var(--primary1), var(--primary2));
       color: white;
       text-align: center;
       padding: 50px 20px;
+      position: relative;
     }
 
     header h1 {
@@ -114,11 +149,23 @@
     @media (max-width:600px){
       header h1{font-size:28px;}
       header p{font-size:16px;}
+      .login-btn span { display: none; }
+      .login-btn { padding: 10px 14px; }
     }
   </style>
 </head>
 
 <body>
+
+<!-- ── Login Button (fixed top-right) ── -->
+<a href="https://congthanhql.github.io/login/" class="login-btn">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+    <polyline points="10 17 15 12 10 7"/>
+    <line x1="15" y1="12" x2="3" y2="12"/>
+  </svg>
+  <span>Đăng nhập</span>
+</a>
 
 <header>
   <h1>🌟 Huỳnh Công Thành</h1>
@@ -184,28 +231,22 @@
       <div class="icon">🔎</div>
       <div class="title">CSDL Hồ Sơ</div>
       <div class="desc">Hệ thống quản lý Hồ Sơ Khách Hàng</div>
-    
     </a>
     <a href="https://congthanhql.github.io/dichvubio/" class="card vip">
       <div class="icon">👜</div>
       <div class="title">Dịch Vụ Bio</div>
       <div class="desc">Các tiện ích & ứng dụng</div>
     </a>
-
- </a>
     <a href="https://congthanhql.github.io/bioverify/" class="card vip">
       <div class="icon">®️</div>
       <div class="title">Chiến Dịch 2026 - 2027</div>
       <div class="desc">Chiến dịch nhằm mục đích kết nối các chủ thể</div>
     </a>
-    
-    </a>
     <a href="https://www.facebook.com/congthanh.bio/" class="card vip">
       <div class="icon">📞</div>
       <div class="title">Liên Hệ QTV!</div>
       <div class="desc">Liên hệ ngay đến quản trị viên để được hỗ trợ!</div>
-    </a>,
-
+    </a>
   </div>
 
 </div>
