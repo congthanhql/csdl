@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🔮 Đặt Lịch Xem Bài - CT-EDU</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== LIGHT MODE (default) ===== */
+:root {
+  --gold: #B8860B;
+  --gold-light: #D4A017;
+  --gold-dark: #8B6914;
+  --bg: #F8F5EE;
+  --bg2: #FFFFFF;
+  --bg3: #F2EDE3;
+  --surface: #EDE8DC;
+  --text: #2A1F0A;
+  --text2: #5A4A2A;
+  --text3: #9A8A6A;
+  --accent: #7B4FC8;
+  --success: #2E7D52;
+  --warning: #B07020;
+  --danger: #C0392B;
+  --border: rgba(139,105,20,0.18);
+  --border2: rgba(139,105,20,0.35);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --card-shadow: 0 2px 12px rgba(139,105,20,0.08);
+  --input-bg: #F5F0E8;
+  --chip-bg: #EDE8DC;
+  --modal-bg: #FFFFFF;
+  --nav-bg: #FDFAF4;
+  --header-bg: #FFFDF7;
+  --option-bg: #F5F0E8;
+  --stat-bg: #FFFFFF;
+}
+[data-theme="dark"] {
+  --gold: #C9A84C;
+  --gold-light: #E8C56A;
+  --gold-dark: #8B6914;
+  --bg: #1A1228;
+  --bg2: #231A35;
+  --bg3: #2E2045;
+  --surface: #302048;
+  --text: #F0EAD6;
+  --text2: #C4B896;
+  --text3: #8A7A60;
+  --accent: #9B6FD8;
+  --success: #4CAF84;
+  --warning: #E8A83E;
+  --danger: #E05C5C;
+  --border: rgba(201,168,76,0.2);
+  --border2: rgba(201,168,76,0.4);
+  --input-bg: #2E2045;
+  --chip-bg: #2E2045;
+  --modal-bg: #231A35;
+  --nav-bg: #1E1530;
+  --header-bg: #231A35;
+  --option-bg: #2E2045;
+  --stat-bg: #231A35;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { transition: background 0.3s, color 0.3s; }
+
+body {
+  font-family: 'Be Vietnam Pro', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+
+.app { max-width: 480px; margin: 0 auto; padding: 0 0 80px; }
+
+/* HEADER */
+.app-header {
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 16px 12px;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-top { display: flex; justify-content: space-between; align-items: center; }
+.app-logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { font-size: 26px; }
+.logo-text { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--gold); font-weight: 600; }
+.logo-sub { font-size: 10px; color: var(--text3); }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.theme-btn {
+  background: var(--chip-bg); border: 1px solid var(--border);
+  color: var(--text2); width: 34px; height: 34px; border-radius: 50%;
+  font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.theme-btn:hover { border-color: var(--border2); }
+.admin-btn {
+  background: transparent; border: 1px solid var(--border2);
+  color: var(--gold); padding: 7px 12px; border-radius: 20px;
+  font-size: 12px; cursor: pointer; font-family: 'Be Vietnam Pro', sans-serif; transition: all 0.2s;
+}
+.admin-btn:hover { background: rgba(139,105,20,0.08); }
+
+/* NAV */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 480px; background: var(--nav-bg);
+  border-top: 1px solid var(--border); display: flex; z-index: 100; padding: 8px 0 14px;
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 4px 8px; cursor: pointer; transition: all 0.2s;
+  border: none; background: none; color: var(--text3); font-family: 'Be Vietnam Pro', sans-serif;
+}
+.nav-item.active { color: var(--gold); }
+.nav-icon { font-size: 20px; }
+.nav-label { font-size: 10px; font-weight: 500; }
+
+/* PAGES */
+.page { display: none; padding: 16px; }
+.page.active { display: block; }
+
+/* SECTION TITLE */
+.section-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--gold); margin-bottom: 4px; }
+.section-sub { font-size: 13px; color: var(--text3); margin-bottom: 16px; }
+
+/* FORM CARD */
+.form-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
+  box-shadow: var(--card-shadow);
+}
+.form-card-title { font-size: 13px; font-weight: 600; color: var(--gold); margin-bottom: 14px; }
+.form-group { margin-bottom: 12px; }
+.form-group:last-child { margin-bottom: 0; }
+.form-label { font-size: 12px; color: var(--text2); font-weight: 500; margin-bottom: 5px; display: block; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 11px 13px; background: var(--input-bg);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text); font-size: 14px; font-family: 'Be Vietnam Pro', sans-serif;
+  transition: border-color 0.2s, background 0.2s; outline: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--gold); }
+.form-select option { background: var(--input-bg); color: var(--text); }
+.form-textarea { min-height: 72px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* QUESTION BUILDER */
+.question-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.question-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: var(--input-bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 12px;
+}
+.question-num {
+  width: 22px; height: 22px; background: var(--gold); color: var(--bg);
+  border-radius: 50%; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+}
+.question-text { flex: 1; font-size: 13px; color: var(--text); line-height: 1.5; word-break: break-word; }
+.question-del {
+  background: none; border: none; color: var(--danger); cursor: pointer;
+  font-size: 16px; padding: 0 2px; flex-shrink: 0; line-height: 1;
+}
+.add-question-row { display: flex; gap: 8px; align-items: flex-end; }
+.add-question-row textarea {
+  flex: 1; padding: 10px 12px; background: var(--input-bg);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text); font-size: 13px; font-family: 'Be Vietnam Pro', sans-serif;
+  min-height: 56px; resize: none; outline: none; transition: border-color 0.2s;
+}
+.add-question-row textarea:focus { border-color: var(--gold); }
+.add-q-btn {
+  padding: 10px 14px; background: var(--gold); border: none;
+  border-radius: var(--radius-sm); color: var(--bg);
+  font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
+  font-family: 'Be Vietnam Pro', sans-serif; transition: all 0.2s; align-self: flex-end;
+}
+.add-q-btn:hover { background: var(--gold-light); }
+
+/* OPTION CARDS */
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.option-card {
+  background: var(--option-bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px 10px;
+  cursor: pointer; transition: all 0.2s; text-align: center; position: relative;
+}
+.option-card.selected { border-color: var(--gold); background: rgba(139,105,20,0.07); }
+.option-card:hover { border-color: var(--border2); }
+.option-icon { font-size: 22px; margin-bottom: 5px; }
+.option-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.option-desc { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.option-check {
+  position: absolute; top: 7px; right: 7px; width: 17px; height: 17px; border-radius: 50%;
+  background: var(--gold); display: none; align-items: center; justify-content: center;
+  font-size: 9px; color: var(--bg);
+}
+.option-card.selected .option-check { display: flex; }
+
+/* CATEGORY TABS */
+.category-tabs { display: flex; gap: 7px; margin-bottom: 14px; }
+.cat-tab {
+  flex: 1; padding: 9px 6px; background: var(--option-bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); text-align: center; cursor: pointer;
+  font-size: 12px; color: var(--text2); transition: all 0.2s; font-family: 'Be Vietnam Pro', sans-serif;
+}
+.cat-tab.active { background: rgba(139,105,20,0.08); border-color: var(--gold); color: var(--gold); font-weight: 600; }
+
+/* PERSON SECTION */
+.person-section { overflow: hidden; max-height: 0; transition: max-height 0.4s ease; }
+.person-section.open { max-height: 600px; }
+
+/* SUBMIT BTN */
+.submit-btn {
+  width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gold-dark), var(--gold-light));
+  border: none; border-radius: var(--radius); color: #1A0F00;
+  font-size: 15px; font-weight: 700; font-family: 'Be Vietnam Pro', sans-serif;
+  cursor: pointer; letter-spacing: 0.3px; transition: all 0.2s; margin-top: 4px;
+}
+.submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,105,20,0.25); }
+.submit-btn:active { transform: scale(0.98); }
+.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* TOAST */
+.toast {
+  position: fixed; top: 76px; left: 50%; transform: translateX(-50%) translateY(-16px);
+  background: var(--bg2); border: 1px solid var(--border2); border-radius: 12px;
+  padding: 11px 18px; font-size: 13px; opacity: 0; transition: all 0.3s;
+  z-index: 999; white-space: nowrap; max-width: 90vw; text-align: center;
+  box-shadow: var(--card-shadow);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: var(--success); color: var(--success); }
+.toast.error { border-color: var(--danger); color: var(--danger); }
+
+/* LOGIN */
+.login-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 28px 22px; max-width: 360px; margin: 32px auto; text-align: center;
+  box-shadow: var(--card-shadow);
+}
+.login-icon { font-size: 44px; margin-bottom: 14px; }
+.login-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--gold); margin-bottom: 6px; }
+.login-sub { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
+.login-btn {
+  width: 100%; padding: 13px; background: linear-gradient(135deg, #5A36A8, #8B6FD8);
+  border: none; border-radius: var(--radius-sm); color: white; font-size: 14px; font-weight: 600;
+  font-family: 'Be Vietnam Pro', sans-serif; cursor: pointer; transition: all 0.2s;
+}
+
+/* DASHBOARD STATS */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.stat-card {
+  background: var(--stat-bg); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px; text-align: center; box-shadow: var(--card-shadow);
+}
+.stat-number { font-size: 30px; font-weight: 700; font-family: 'Playfair Display', serif; }
+.stat-label { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.stat-card.total .stat-number { color: var(--gold); }
+.stat-card.pending .stat-number { color: var(--warning); }
+.stat-card.confirmed .stat-number { color: var(--success); }
+.stat-card.rejected .stat-number { color: var(--danger); }
+
+/* BOOKING LIST */
+.booking-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.2s;
+  box-shadow: var(--card-shadow);
+}
+.booking-card:hover { border-color: var(--border2); }
+.booking-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.booking-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.booking-time { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.status-badge { padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.status-badge.pending { background: rgba(176,112,32,0.12); color: var(--warning); border: 1px solid rgba(176,112,32,0.3); }
+.status-badge.confirmed { background: rgba(46,125,82,0.12); color: var(--success); border: 1px solid rgba(46,125,82,0.3); }
+.status-badge.rejected { background: rgba(192,57,43,0.12); color: var(--danger); border: 1px solid rgba(192,57,43,0.3); }
+.booking-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.booking-tag {
+  padding: 2px 8px; background: var(--chip-bg); border: 1px solid var(--border);
+  border-radius: 12px; font-size: 11px; color: var(--text2);
+}
+
+/* FILTER */
+.filter-bar { display: flex; gap: 7px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
+.filter-chip {
+  padding: 6px 13px; background: var(--chip-bg); border: 1px solid var(--border);
+  border-radius: 20px; font-size: 12px; color: var(--text2); cursor: pointer;
+  white-space: nowrap; transition: all 0.2s; font-family: 'Be Vietnam Pro', sans-serif;
+}
+.filter-chip.active { border-color: var(--gold); color: var(--gold); background: rgba(139,105,20,0.07); }
+
+/* SEARCH */
+.search-bar {
+  display: flex; align-items: center; gap: 8px; background: var(--input-bg);
+  border: 1px solid var(--border); border-radius: 12px; padding: 9px 13px; margin-bottom: 14px;
+}
+.search-bar input { flex: 1; background: none; border: none; color: var(--text); font-size: 13px; outline: none; font-family: 'Be Vietnam Pro', sans-serif; }
+.search-bar input::placeholder { color: var(--text3); }
+
+/* DETAIL MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 200;
+  display: none; align-items: flex-end;
+}
+.modal-overlay.open { display: flex; }
+.modal-sheet {
+  background: var(--modal-bg); border-radius: 22px 22px 0 0; border: 1px solid var(--border);
+  width: 100%; max-height: 92vh; overflow-y: auto;
+  padding: 20px 18px 28px; animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle { width: 38px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 18px; }
+.modal-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold); margin-bottom: 16px; }
+.detail-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.detail-label { color: var(--text3); min-width: 120px; }
+.detail-value { color: var(--text); text-align: right; font-weight: 500; word-break: break-word; max-width: 55%; }
+.action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.action-btn {
+  padding: 11px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
+  border: none; cursor: pointer; font-family: 'Be Vietnam Pro', sans-serif; transition: all 0.2s;
+}
+.action-btn.confirm { background: rgba(46,125,82,0.12); color: var(--success); border: 1px solid rgba(46,125,82,0.35); }
+.action-btn.reject { background: rgba(192,57,43,0.12); color: var(--danger); border: 1px solid rgba(192,57,43,0.35); }
+.action-btn.pdf { background: rgba(139,105,20,0.1); color: var(--gold); border: 1px solid rgba(139,105,20,0.35); grid-column: span 2; }
+.action-btn.seen { background: rgba(123,79,200,0.1); color: var(--accent); border: 1px solid rgba(123,79,200,0.35); }
+.action-btn.paid-btn { background: rgba(46,125,82,0.1); color: var(--success); border: 1px solid rgba(46,125,82,0.3); }
+
+/* EMPTY / LOADING */
+.empty-state { text-align: center; padding: 44px 24px; }
+.empty-icon { font-size: 44px; margin-bottom: 12px; }
+.empty-text { font-size: 13px; color: var(--text3); }
+.loading-state { text-align: center; padding: 32px; }
+.spinner { width: 20px; height: 20px; border: 2px solid var(--border2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="header-top">
+      <div class="app-logo">
+        <div class="logo-icon">🔮</div>
+        <div>
+          <div class="logo-text">Xem Bài CT-EDU</div>
+          <div class="logo-sub">Đặt lịch & Tra cứu vận mệnh</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Đổi giao diện">🌙</button>
+        <button class="admin-btn" onclick="showAdminLogin()">⚙ Admin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: ĐẶT LỊCH -->
+  <div id="page-booking" class="page active">
+    <div class="section-title" style="margin-top:4px">✨ Đặt Lịch Xem Bài</div>
+    <div class="section-sub">Điền đầy đủ thông tin để đặt lịch</div>
+
+    <!-- THÔNG TIN CÁ NHÂN -->
+    <div class="form-card">
+      <div class="form-card-title">👤 Thông Tin Cá Nhân</div>
+      <div class="form-group">
+        <label class="form-label">Họ và Tên *</label>
+        <input type="text" class="form-input" id="f-name" placeholder="Nguyễn Văn A">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ngày Tháng Năm Sinh *</label>
+          <input type="date" class="form-input" id="f-dob">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Giới Tính</label>
+          <select class="form-select" id="f-gender">
+            <option value="">Chọn...</option>
+            <option value="Nam">Nam</option>
+            <option value="Nữ">Nữ</option>
+            <option value="Khác">Khác</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Số Điện Thoại *</label>
+          <input type="tel" class="form-input" id="f-phone" placeholder="0901234567">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gmail (nhận kết quả) *</label>
+          <input type="email" class="form-input" id="f-email" placeholder="ten@gmail.com">
+        </div>
+      </div>
+    </div>
+
+    <!-- DANH MỤC XEM -->
+    <div class="form-card">
+      <div class="form-card-title">🎯 Danh Mục Xem</div>
+      <div class="category-tabs">
+        <div class="cat-tab active" onclick="selectCategory('general', this)">🌟 Tổng Quát</div>
+        <div class="cat-tab" onclick="selectCategory('love', this)">💕 Tình Yêu / GĐ</div>
+        <div class="cat-tab" onclick="selectCategory('career', this)">💼 Sự Nghiệp</div>
+      </div>
+      <div class="person-section" id="person-section">
+        <div style="background: rgba(139,105,20,0.05); border: 1px solid rgba(139,105,20,0.15); border-radius: var(--radius-sm); padding: 13px; margin-bottom: 12px;">
+          <div style="font-size: 13px; font-weight: 600; color: var(--gold); margin-bottom: 11px;">💝 Thông Tin Người Ấy</div>
+          <div class="form-group">
+            <label class="form-label">Tên Người Ấy</label>
+            <input type="text" class="form-input" id="f-partner-name" placeholder="Họ tên người ấy">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Ngày Sinh</label>
+              <input type="date" class="form-input" id="f-partner-dob">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Giới Tính</label>
+              <select class="form-select" id="f-partner-gender">
+                <option value="">Chọn...</option>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mối Quan Hệ</label>
+            <select class="form-select" id="f-relationship">
+              <option value="Người Yêu">Người Yêu</option>
+              <option value="Bạn Bè">Bạn Bè</option>
+              <option value="Gia Đình">Gia Đình</option>
+              <option value="Bạch Diện">Bạch Diện</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOẠI BÀI XEM -->
+    <div class="form-card">
+      <div class="form-card-title">🃏 Loại Bài Xem</div>
+      <div class="options-grid" id="deck-options">
+        <div class="option-card selected" onclick="selectDeck('Bài Tây', this)">
+          <div class="option-check">✓</div>
+          <div class="option-icon">🃏</div>
+          <div class="option-name">Bài Tây</div>
+          <div class="option-desc">Playing cards</div>
+        </div>
+        <div class="option-card" onclick="selectDeck('Tarot', this)">
+          <div class="option-check">✓</div>
+          <div class="option-icon">🌙</div>
+          <div class="option-name">Tarot</div>
+          <div class="option-desc">78 lá bài</div>
+        </div>
+        <div class="option-card" onclick="selectDeck('Lenormand', this)">
+          <div class="option-check">✓</div>
+          <div class="option-icon">🌹</div>
+          <div class="option-name">Lenormand</div>
+          <div class="option-desc">36 lá bài</div>
+        </div>
+        <div class="option-card" onclick="selectDeck('Kinh Dịch', this)">
+          <div class="option-check">✓</div>
+          <div class="option-icon">☯️</div>
+          <div class="option-name">Kinh Dịch</div>
+          <div class="option-desc">64 quẻ dịch</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GÓI XEM -->
+    <div class="form-card">
+      <div class="form-card-title">⏳ Gói Xem</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="option-card selected" onclick="selectPackage('Hiện Tại', this)">
+          <div class="option-check">✓</div>
+          <div class="option-icon">🔍</div>
+          <div class="option-name">Hiện Tại</div>
+          <div class="option-desc">Tình trạng hiện tại</div>
+        </div>
+        <div class="option-card" onclick="selectPackage('Tương Lai', this)">
+          <div class="option-check">✓</div>
+          <div class="option-icon">🌠</div>
+          <div class="option-name">Tương Lai</div>
+          <div class="option-desc">Dự đoán tương lai</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CÂU HỎI -->
+    <div class="form-card">
+      <div class="form-card-title">❓ Câu Hỏi Của Bạn</div>
+      <div class="question-list" id="question-list"></div>
+      <div class="add-question-row">
+        <textarea id="new-question-input" placeholder="Nhập câu hỏi bạn muốn hỏi..." rows="2"></textarea>
+        <button class="add-q-btn" onclick="addQuestion()">+ Thêm</button>
+      </div>
+      <div style="font-size: 11px; color: var(--text3); margin-top: 8px;">Thêm tối đa 5 câu hỏi cho buổi xem bài</div>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitBooking()">
+      🔮 Xác Nhận Đặt Lịch
+    </button>
+  </div>
+
+  <!-- PAGE: ADMIN -->
+  <div id="page-admin" class="page">
+    <div id="admin-login-view">
+      <div class="login-card">
+        <div class="login-icon">🔐</div>
+        <div class="login-title">Khu Vực Admin</div>
+        <div class="login-sub">Đăng nhập để quản lý đặt lịch</div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="admin-email" placeholder="admin@example.com" value="bioverify@googlegroups.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mật Khẩu</label>
+          <input type="password" class="form-input" id="admin-pass" placeholder="••••••••" value="Thanh123@">
+        </div>
+        <button class="login-btn" onclick="adminLogin()">🔓 Đăng Nhập</button>
+      </div>
+    </div>
+
+    <div id="admin-dashboard-view" style="display:none">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <div class="section-title" style="margin-top:0">📊 Tổng Quan</div>
+        <button onclick="adminLogout()" style="background:none;border:1px solid var(--border);color:var(--text3);padding:6px 11px;border-radius:20px;font-size:12px;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;">Đăng xuất</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card total"><div class="stat-number" id="stat-total">0</div><div class="stat-label">📋 Tổng Khách</div></div>
+        <div class="stat-card pending"><div class="stat-number" id="stat-pending">0</div><div class="stat-label">⏳ Chờ Xử Lý</div></div>
+        <div class="stat-card confirmed"><div class="stat-number" id="stat-confirmed">0</div><div class="stat-label">✅ Xác Nhận</div></div>
+        <div class="stat-card rejected"><div class="stat-number" id="stat-rejected">0</div><div class="stat-label">❌ Từ Chối</div></div>
+      </div>
+
+      <div class="search-bar">
+        <span>🔍</span>
+        <input type="text" placeholder="Tìm theo tên, SĐT, Gmail..." id="search-input" oninput="filterBookings()">
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-chip active" onclick="setFilter('all', this)">Tất Cả</div>
+        <div class="filter-chip" onclick="setFilter('pending', this)">⏳ Chờ</div>
+        <div class="filter-chip" onclick="setFilter('confirmed', this)">✅ Xác Nhận</div>
+        <div class="filter-chip" onclick="setFilter('rejected', this)">❌ Từ Chối</div>
+      </div>
+
+      <div id="bookings-list">
+        <div class="loading-state"><div class="spinner"></div><div style="margin-top:10px;color:var(--text3);font-size:13px;">Đang tải...</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-item active" id="nav-booking" onclick="switchPage('booking')">
+    <div class="nav-icon">🔮</div>
+    <div class="nav-label">Đặt Lịch</div>
+  </button>
+  <button class="nav-item" id="nav-admin" onclick="switchPage('admin')">
+    <div class="nav-icon">⚙️</div>
+    <div class="nav-label">Quản Lý</div>
+  </button>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-title">Chi Tiết Đặt Lịch</div>
+    <div id="modal-content"></div>
+    <div class="action-row" id="modal-actions"></div>
+    <button onclick="closeModal()" style="width:100%;padding:11px;background:none;border:1px solid var(--border);color:var(--text3);border-radius:var(--radius-sm);font-size:13px;cursor:pointer;margin-top:8px;font-family:'Be Vietnam Pro',sans-serif;">Đóng</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+// THEME - default theo thiết bị
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+let isDark = localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : prefersDark;
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-btn').textContent = isDark ? '☀️' : '🌙';
+}
+function toggleTheme() {
+  isDark = !isDark;
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  applyTheme();
+}
+applyTheme();
+
+// FIREBASE
+const firebaseConfig = {
+  apiKey: "AIzaSyDtAU-Iqn-u39_mgkxRZ3fIF_Kyxqn-Gyg",
+  authDomain: "csdl-bio.firebaseapp.com",
+  databaseURL: "https://csdl-bio-default-rtdb.firebaseio.com",
+  projectId: "csdl-bio",
+  storageBucket: "csdl-bio.firebasestorage.app",
+  messagingSenderId: "568258817515",
+  appId: "1:568258817515:web:595a8afe906a3143a63dae"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// STATE
+let selectedDeck = 'Bài Tây';
+let selectedPackage = 'Hiện Tại';
+let selectedCategory = 'general';
+let isAdmin = false;
+let allBookings = [];
+let currentFilter = 'all';
+let userQuestions = [];
+
+// THEME listener
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+  if (!localStorage.getItem('theme')) { isDark = e.matches; applyTheme(); }
+});
+
+// PAGE NAV
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('nav-' + page).classList.add('active');
+  if (page === 'admin' && isAdmin) loadBookings();
+}
+function showAdminLogin() { switchPage('admin'); }
+
+// CATEGORY
+function selectCategory(cat, el) {
+  selectedCategory = cat;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('person-section').classList.toggle('open', cat === 'love');
+}
+
+// DECK / PACKAGE
+function selectDeck(deck, el) {
+  selectedDeck = deck;
+  document.querySelectorAll('#deck-options .option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectPackage(pkg, el) {
+  selectedPackage = pkg;
+  el.closest('div').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// QUESTIONS
+function renderQuestions() {
+  const list = document.getElementById('question-list');
+  if (!userQuestions.length) { list.innerHTML = ''; return; }
+  list.innerHTML = userQuestions.map((q, i) => `
+    <div class="question-item">
+      <div class="question-num">${i+1}</div>
+      <div class="question-text">${escHtml(q)}</div>
+      <button class="question-del" onclick="removeQuestion(${i})" title="Xóa câu hỏi">×</button>
+    </div>
+  `).join('');
+}
+function addQuestion() {
+  const inp = document.getElementById('new-question-input');
+  const val = inp.value.trim();
+  if (!val) { showToast('⚠ Nhập câu hỏi trước!', 'error'); return; }
+  if (userQuestions.length >= 5) { showToast('⚠ Tối đa 5 câu hỏi!', 'error'); return; }
+  userQuestions.push(val);
+  inp.value = '';
+  renderQuestions();
+}
+function removeQuestion(idx) {
+  userQuestions.splice(idx, 1);
+  renderQuestions();
+}
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// SUBMIT
+async function submitBooking() {
+  const name = document.getElementById('f-name').value.trim();
+  const dob = document.getElementById('f-dob').value;
+  const phone = document.getElementById('f-phone').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const gender = document.getElementById('f-gender').value;
+
+  if (!name) { showToast('⚠ Vui lòng nhập họ tên!', 'error'); return; }
+  if (!dob) { showToast('⚠ Vui lòng chọn ngày sinh!', 'error'); return; }
+  if (!phone) { showToast('⚠ Vui lòng nhập số điện thoại!', 'error'); return; }
+  if (!email) { showToast('⚠ Vui lòng nhập Gmail!', 'error'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,0.2);border-top-color:#333;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:8px"></span>Đang xử lý...';
+
+  const booking = {
+    name, dob, phone, email, gender,
+    category: selectedCategory,
+    deck: selectedDeck,
+    package: selectedPackage,
+    questions: userQuestions.length ? userQuestions : [],
+    status: 'pending',
+    seen: false,
+    paid: false,
+    createdAt: Date.now(),
+    createdAtStr: new Date().toLocaleString('vi-VN')
+  };
+
+  if (selectedCategory === 'love') {
+    booking.partnerName = document.getElementById('f-partner-name').value.trim();
+    booking.partnerDob = document.getElementById('f-partner-dob').value;
+    booking.partnerGender = document.getElementById('f-partner-gender').value;
+    booking.relationship = document.getElementById('f-relationship').value;
+  }
+
+  try {
+    await db.ref('bookings').push(booking);
+    showToast('✅ Đặt lịch thành công!', 'success');
+    resetForm();
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Lỗi kết nối, thử lại!', 'error');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '🔮 Xác Nhận Đặt Lịch';
+}
+
+function resetForm() {
+  ['f-name','f-dob','f-phone','f-email','f-partner-name','f-partner-dob'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  ['f-gender','f-partner-gender'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  userQuestions = [];
+  renderQuestions();
+  document.getElementById('new-question-input').value = '';
+}
+
+// ADMIN
+function adminLogin() {
+  const e = document.getElementById('admin-email').value.trim();
+  const p = document.getElementById('admin-pass').value.trim();
+  if (e === 'bioverify@googlegroups.com' && p === 'Thanh123@') {
+    isAdmin = true;
+    document.getElementById('admin-login-view').style.display = 'none';
+    document.getElementById('admin-dashboard-view').style.display = 'block';
+    loadBookings();
+    showToast('✅ Đăng nhập thành công!', 'success');
+  } else {
+    showToast('❌ Sai thông tin đăng nhập!', 'error');
+  }
+}
+function adminLogout() {
+  isAdmin = false;
+  document.getElementById('admin-login-view').style.display = 'block';
+  document.getElementById('admin-dashboard-view').style.display = 'none';
+}
+
+function loadBookings() {
+  db.ref('bookings').orderByChild('createdAt').on('value', snap => {
+    allBookings = [];
+    snap.forEach(child => allBookings.unshift({ id: child.key, ...child.val() }));
+    updateStats();
+    renderBookings();
+  });
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = allBookings.length;
+  document.getElementById('stat-pending').textContent = allBookings.filter(b=>b.status==='pending').length;
+  document.getElementById('stat-confirmed').textContent = allBookings.filter(b=>b.status==='confirmed').length;
+  document.getElementById('stat-rejected').textContent = allBookings.filter(b=>b.status==='rejected').length;
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderBookings();
+}
+function filterBookings() { renderBookings(); }
+
+function renderBookings() {
+  const search = (document.getElementById('search-input').value || '').toLowerCase();
+  const filtered = allBookings.filter(b => {
+    const matchF = currentFilter === 'all' || b.status === currentFilter;
+    const matchS = !search || b.name.toLowerCase().includes(search) || (b.phone||'').includes(search) || (b.email||'').toLowerCase().includes(search);
+    return matchF && matchS;
+  });
+
+  const c = document.getElementById('bookings-list');
+  if (!filtered.length) {
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Không có đặt lịch nào</div></div>';
+    return;
+  }
+  const catLabel = { general:'Tổng Quát', love:'Tình Yêu / GĐ', career:'Sự Nghiệp' };
+  c.innerHTML = filtered.map(b => `
+    <div class="booking-card" onclick="openDetail('${b.id}')">
+      <div class="booking-header">
+        <div>
+          <div class="booking-name">${escHtml(b.name)}</div>
+          <div class="booking-time">📅 ${b.createdAtStr || '--'} · ${b.phone||'--'}</div>
+        </div>
+        <div class="status-badge ${b.status}">${b.status==='pending'?'⏳ Chờ':b.status==='confirmed'?'✅ Xác nhận':'❌ Từ chối'}</div>
+      </div>
+      <div class="booking-tags">
+        <span class="booking-tag">🃏 ${b.deck}</span>
+        <span class="booking-tag">⏳ ${b.package}</span>
+        <span class="booking-tag">🎯 ${catLabel[b.category]||b.category}</span>
+        ${b.questions&&b.questions.length?`<span class="booking-tag">❓ ${b.questions.length} câu hỏi</span>`:''}
+        ${b.seen?'<span class="booking-tag" style="color:var(--accent)">👁 Đã Xem</span>':''}
+        ${b.paid?'<span class="booking-tag" style="color:var(--success)">💰 Đã TT</span>':''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function openDetail(id) {
+  const b = allBookings.find(x=>x.id===id);
+  if (!b) return;
+  const catLabel = { general:'🌟 Tổng Quát', love:'💕 Tình Yêu / GĐ', career:'💼 Sự Nghiệp' };
+  document.getElementById('modal-title').textContent = '📋 ' + b.name;
+
+  let rows = [
+    ['Họ Tên', b.name],
+    ['Ngày Sinh', b.dob ? new Date(b.dob+'T00:00:00').toLocaleDateString('vi-VN') : '--'],
+    ['Giới Tính', b.gender||'--'],
+    ['Điện Thoại', b.phone||'--'],
+    ['Gmail', b.email||'--'],
+    ['Danh Mục', catLabel[b.category]||b.category],
+    ['Loại Bài', '🃏 '+b.deck],
+    ['Gói Xem', b.package],
+    ['Ngày Đặt', b.createdAtStr||'--'],
+    ['Trạng Thái', b.status==='pending'?'⏳ Chờ':b.status==='confirmed'?'✅ Xác nhận':'❌ Từ chối'],
+    ['Đã Xem', b.seen?'✅ Rồi':'❌ Chưa'],
+    ['Thanh Toán', b.paid?'✅ Rồi':'❌ Chưa'],
+  ];
+
+  if (b.category==='love' && b.partnerName) {
+    rows.splice(5,0,
+      ['Tên Người Ấy', b.partnerName||'--'],
+      ['Sinh Người Ấy', b.partnerDob?new Date(b.partnerDob+'T00:00:00').toLocaleDateString('vi-VN'):'--'],
+      ['Giới Tính (NA)', b.partnerGender||'--'],
+      ['Mối Quan Hệ', b.relationship||'--'],
+    );
+  }
+
+  let questionsHtml = '';
+  if (b.questions && b.questions.length) {
+    questionsHtml = `<div style="margin-top:12px;padding:12px;background:var(--chip-bg);border-radius:var(--radius-sm);border:1px solid var(--border)">
+      <div style="font-size:12px;font-weight:600;color:var(--gold);margin-bottom:10px">❓ Câu Hỏi (${b.questions.length})</div>
+      ${b.questions.map((q,i)=>`<div style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--text)"><span style="color:var(--gold);font-weight:700">${i+1}.</span> ${escHtml(q)}</div>`).join('')}
+    </div>`;
+  }
+
+  document.getElementById('modal-content').innerHTML =
+    rows.map(([k,v]) => `<div class="detail-row"><span class="detail-label">${k}</span><span class="detail-value">${escHtml(String(v))}</span></div>`).join('') + questionsHtml;
+
+  document.getElementById('modal-actions').innerHTML = `
+    <button class="action-btn confirm" onclick="updateStatus('${id}','confirmed')">✅ Xác Nhận</button>
+    <button class="action-btn reject" onclick="updateStatus('${id}','rejected')">❌ Từ Chối</button>
+    <button class="action-btn seen" onclick="markSeen('${id}')">👁 Đã Xem</button>
+    <button class="action-btn paid-btn" onclick="markPaid('${id}')">💰 Đã Thanh Toán</button>
+    <button class="action-btn pdf" onclick="exportPDF('${id}')">📄 Tải PDF</button>
+  `;
+
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('detail-modal').classList.remove('open'); }
+
+async function updateStatus(id, status) {
+  await db.ref('bookings/'+id).update({ status });
+  showToast(status==='confirmed'?'✅ Đã xác nhận!':'❌ Đã từ chối!', 'success');
+  closeModal();
+}
+async function markSeen(id) {
+  await db.ref('bookings/'+id).update({ seen: true });
+  showToast('👁 Đã đánh dấu đã xem!', 'success');
+  closeModal();
+}
+async function markPaid(id) {
+  await db.ref('bookings/'+id).update({ paid: true });
+  showToast('💰 Đã đánh dấu thanh toán!', 'success');
+  closeModal();
+}
+
+// EXPORT PDF
+function exportPDF(id) {
+  const b = allBookings.find(x=>x.id===id);
+  if (!b) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  doc.setFont('helvetica');
+
+  doc.setFillColor(26,18,40);
+  doc.rect(0,0,210,38,'F');
+  doc.setTextColor(201,168,76);
+  doc.setFontSize(18);
+  doc.text('DAT LICH XEM BAI - CT-EDU', 105, 16, { align:'center' });
+  doc.setFontSize(10);
+  doc.setTextColor(180,160,120);
+  doc.text('Thong tin chi tiet dat lich', 105, 26, { align:'center' });
+
+  const catLabel = { general:'Tong Quat', love:'Tinh Yeu / Gia Dinh', career:'Su Nghiep' };
+  const rows = [
+    ['Ho Ten', b.name||'--'],
+    ['Ngay Thang Nam Sinh', b.dob?new Date(b.dob+'T00:00:00').toLocaleDateString('vi-VN'):'--'],
+    ['Gioi Tinh', b.gender||'--'],
+    ['So Dien Thoai', b.phone||'--'],
+    ['Gmail', b.email||'--'],
+    ['Danh Muc Xem', catLabel[b.category]||b.category],
+    ['Loai Bai', b.deck],
+    ['Goi Xem', b.package],
+    ['Thoi Gian Dat Lich', b.createdAtStr||'--'],
+    ['Trang Thai', b.status==='pending'?'Cho xu ly':b.status==='confirmed'?'Da xac nhan':'Tu choi'],
+    ['Da Xem', b.seen?'Co':'Chua'],
+    ['Da Thanh Toan', b.paid?'Co':'Chua'],
+  ];
+
+  if (b.category==='love') {
+    rows.splice(5,0,
+      ['Nguoi Ay - Ho Ten', b.partnerName||'--'],
+      ['Nguoi Ay - Ngay Sinh', b.partnerDob?new Date(b.partnerDob+'T00:00:00').toLocaleDateString('vi-VN'):'--'],
+      ['Nguoi Ay - Gioi Tinh', b.partnerGender||'--'],
+      ['Moi Quan He', b.relationship||'--'],
+    );
+  }
+
+  if (b.questions && b.questions.length) {
+    b.questions.forEach((q,i) => rows.push(['Cau hoi '+(i+1), q]));
+  }
+
+  doc.autoTable({
+    startY: 44,
+    head: [['Thong Tin', 'Chi Tiet']],
+    body: rows,
+    theme: 'grid',
+    headStyles: { fillColor:[26,18,40], textColor:[201,168,76], fontStyle:'bold', fontSize:11 },
+    bodyStyles: { fontSize:10, textColor:[40,30,60] },
+    alternateRowStyles: { fillColor:[245,240,255] },
+    columnStyles: { 0:{ cellWidth:62, fontStyle:'bold', textColor:[80,60,100] }, 1:{ cellWidth:118 } },
+    margin: { left:15, right:15 }
+  });
+
+  const finalY = doc.lastAutoTable.finalY + 10;
+  doc.setFontSize(9); doc.setTextColor(150,130,100);
+  doc.text('Xuat ban: '+new Date().toLocaleString('vi-VN'), 105, finalY, { align:'center' });
+  doc.text('CT-EDU | He thong quan ly dat lich xem bai', 105, finalY+6, { align:'center' });
+  doc.save('DatLich_'+b.name.replace(/\s/g,'_')+'.pdf');
+  showToast('📄 Đã xuất PDF!', 'success');
+}
+
+// TOAST
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast '+type+' show';
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// Close modal on overlay click
+document.getElementById('detail-modal').addEventListener('click', function(e) {
+  if (e.target===this) closeModal();
+});
+
+// Enter to add question
+document.addEventListener('DOMContentLoaded', () => {
+  const qi = document.getElementById('new-question-input');
+  if (qi) {
+    qi.addEventListener('keydown', e => {
+      if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); addQuestion(); }
+    });
+  }
+});
+</script>
+</body>
+</html>
