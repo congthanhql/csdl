@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>T-SHARE · Tra Cứu Bài</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+/* ─── THEME VARIABLES ─── */
+[data-theme="dark"]{
+  --bg:#0b0c15;
+  --bg2:#0f1020;
+  --surface:#141728;
+  --surface2:#1c2035;
+  --surface3:#242840;
+  --border:#ffffff10;
+  --border2:#ffffff1e;
+  --border3:#ffffff30;
+  --gold:#c9a84c;
+  --gold2:#e8c97a;
+  --text:#e8e4d8;
+  --text2:#c5bfb0;
+  --muted:#7a7568;
+  --accent:#7b6ee8;
+  --red:#e85454;
+  --teal:#4ecdc4;
+  --amber:#f4a836;
+  --green:#52c97a;
+  --shadow:0 8px 32px rgba(0,0,0,.5);
+  --shadow2:0 2px 12px rgba(0,0,0,.4);
+  --overlay:rgba(0,0,0,.75);
+}
+[data-theme="light"]{
+  --bg:#f5f2eb;
+  --bg2:#ede9e0;
+  --surface:#ffffff;
+  --surface2:#f8f5ef;
+  --surface3:#f0ece3;
+  --border:#00000010;
+  --border2:#0000001a;
+  --border3:#00000028;
+  --gold:#a07828;
+  --gold2:#c49a3a;
+  --text:#1a1710;
+  --text2:#3a3520;
+  --muted:#8a8070;
+  --accent:#5548c8;
+  --red:#cc2222;
+  --teal:#1a9490;
+  --amber:#c47818;
+  --green:#1a8040;
+  --shadow:0 4px 20px rgba(0,0,0,.12);
+  --shadow2:0 2px 8px rgba(0,0,0,.08);
+  --overlay:rgba(0,0,0,.5);
+}
+
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+
+/* ─── STARFIELD (dark only) ─── */
+[data-theme="dark"] body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(1px 1px at 15% 25%,#ffffff18 0%,transparent 100%),
+    radial-gradient(1px 1px at 75% 8%,#ffffff14 0%,transparent 100%),
+    radial-gradient(1px 1px at 45% 75%,#ffffff12 0%,transparent 100%),
+    radial-gradient(1px 1px at 85% 65%,#ffffff16 0%,transparent 100%);
+  pointer-events:none;z-index:0
+}
+
+/* ─── SCREENS ─── */
+.screen{display:none;min-height:100vh;position:relative;z-index:1}
+.screen.active{display:flex;flex-direction:column}
+
+/* ─── LOGIN ─── */
+#screen-login{align-items:center;justify-content:center;padding:20px}
+.login-card{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border2);border-radius:24px;padding:36px 28px;box-shadow:var(--shadow)}
+.sigil{font-family:'Cormorant Garamond',serif;font-size:52px;color:var(--gold);line-height:1;text-align:center;margin-bottom:12px;filter:drop-shadow(0 0 14px color-mix(in srgb,var(--gold) 40%,transparent))}
+.login-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--text);text-align:center;margin-bottom:4px}
+.login-sub{font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;text-align:center;margin-bottom:28px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.field label{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.field input{background:var(--surface2);border:1.5px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;font-family:'DM Sans',sans-serif;outline:none;transition:border .2s,background .2s;width:100%}
+.field input:focus{border-color:var(--gold);background:var(--surface3)}
+.field input::placeholder{color:var(--muted)}
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1208;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:opacity .2s,transform .1s;margin-top:4px}
+.btn-primary:hover{opacity:.9}
+.btn-primary:active{transform:scale(.98)}
+.err-msg{color:var(--red);font-size:13px;text-align:center;display:none;padding:8px 0}
+.theme-toggle-login{position:absolute;top:16px;right:16px;background:var(--surface);border:1.5px solid var(--border2);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--muted);transition:all .2s}
+.theme-toggle-login:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ─── MEMBER CODE SCREEN ─── */
+#screen-code{align-items:center;justify-content:center;padding:20px}
+.code-card{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border2);border-radius:24px;padding:36px 28px;box-shadow:var(--shadow);text-align:center}
+.code-card .sigil{font-size:40px;margin-bottom:10px}
+.code-welcome{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--text);margin-bottom:4px}
+.code-user{font-size:13px;color:var(--gold);margin-bottom:24px}
+.code-input{background:var(--surface2);border:1.5px solid var(--border2);border-radius:10px;padding:14px;color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;transition:border .2s;width:100%;text-align:center;letter-spacing:.12em;margin-bottom:14px}
+.code-input:focus{border-color:var(--gold)}
+.btn-logout{background:transparent;border:1.5px solid var(--border2);color:var(--muted);border-radius:8px;padding:8px 18px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:12px;transition:all .2s;width:100%}
+.btn-logout:hover{border-color:var(--red);color:var(--red)}
+
+/* ─── PENDING APPROVAL ─── */
+#screen-pending{align-items:center;justify-content:center;padding:20px;text-align:center}
+.pending-card{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border2);border-radius:24px;padding:36px 28px;box-shadow:var(--shadow)}
+.pending-icon{font-size:48px;margin-bottom:16px}
+.pending-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--amber);margin-bottom:8px}
+.pending-desc{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+#screen-error .error-card{text-align:center}
+.error-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--red);margin-bottom:8px}
+
+/* ─── MAIN APP ─── */
+#screen-app{padding-bottom:80px}
+.app-header{padding:16px 16px 0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding-bottom:12px}
+.app-header-left{display:flex;align-items:center;gap:10px}
+.app-logo{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold)}
+.app-logo span{font-size:11px;color:var(--muted);display:block;letter-spacing:.1em;font-family:'DM Sans',sans-serif;line-height:1}
+.header-actions{display:flex;gap:8px;align-items:center}
+.icon-btn{background:var(--surface);border:1.5px solid var(--border2);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--muted);transition:all .2s}
+.icon-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ─── BOTTOM NAV ─── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--surface);border-top:1px solid var(--border2);display:flex;padding:8px 4px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.2)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px;border-radius:12px;cursor:pointer;transition:all .2s;color:var(--muted);font-size:10px;font-weight:500;letter-spacing:.02em;-webkit-user-select:none;user-select:none}
+.nav-item:hover{color:var(--text)}
+.nav-item.active{color:var(--gold)}
+.nav-item.active .nav-icon{background:color-mix(in srgb,var(--gold) 15%,transparent)}
+.nav-icon{font-size:20px;width:36px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all .2s}
+
+/* ─── PANELS ─── */
+.panel{display:none;padding:16px 14px;animation:fadeIn .2s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── SEARCH ─── */
+.search-bar{position:relative;margin-bottom:14px}
+.search-bar input{width:100%;background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;padding:12px 16px 12px 42px;color:var(--text);font-size:15px;font-family:'DM Sans',sans-serif;outline:none;transition:border .2s;-webkit-appearance:none}
+.search-bar input:focus{border-color:var(--gold)}
+.search-bar input::placeholder{color:var(--muted)}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--muted);pointer-events:none}
+
+/* ─── SUIT FILTER CHIPS ─── */
+.chips{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;background:var(--surface);border:1.5px solid var(--border2);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap}
+.chip:active{transform:scale(.95)}
+.chip.active{background:var(--surface2);border-color:var(--gold);color:var(--gold)}
+
+/* ─── CARD GRID ─── */
+.cards-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:480px){.cards-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:768px){.cards-grid{grid-template-columns:repeat(4,1fr)}}
+.card-item{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .2s;active-scale:.97}
+.card-item:active{transform:scale(.97);background:var(--surface2)}
+.card-suit{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.card-name{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--text);margin-bottom:2px;line-height:1.2}
+.card-name-vi{font-size:12px;color:var(--gold);margin-bottom:4px}
+.card-keys{font-size:11px;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-item.wands .card-name-vi{color:#e8634c}
+.card-item.cups .card-name-vi{color:#4e9de8}
+.card-item.swords .card-name-vi{color:#8fa0b0}
+.card-item.pentacles .card-name-vi{color:var(--amber)}
+.card-item.major .card-name-vi{color:var(--accent)}
+
+/* ─── LENORMAND GRID ─── */
+.len-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:480px){.len-grid{grid-template-columns:repeat(2,1fr)}}
+.len-card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:16px}
+.len-badge{display:inline-block;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:3px 10px;font-size:11px;color:var(--gold);margin-bottom:8px}
+.len-name{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--text);margin-bottom:2px}
+.len-vn{font-size:12px;color:var(--gold);margin-bottom:8px}
+.len-field{font-size:12px;line-height:1.5;margin-bottom:4px;color:var(--text2)}
+.len-field strong{color:var(--muted);margin-right:5px;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+
+/* ─── YES/NO ─── */
+.yn-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.yn-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:18px 14px}
+.yn-nums{font-family:'Cormorant Garamond',serif;font-size:26px;margin-bottom:6px}
+.yn-result{font-size:13px;color:var(--text2);line-height:1.4}
+.yn-result strong{color:var(--text)}
+.yn-yes .yn-nums{color:var(--teal)}
+.yn-wait .yn-nums{color:var(--amber)}
+.yn-chat .yn-nums{color:var(--accent)}
+.yn-soon .yn-nums{color:var(--gold2)}
+.yn-guide{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:16px}
+.yn-guide h4{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:10px}
+.yn-guide li{font-size:13px;color:var(--muted);line-height:2;padding-left:4px;margin-left:14px}
+
+/* ─── MODAL ─── */
+.modal-overlay{position:fixed;inset:0;background:var(--overlay);z-index:500;display:none;align-items:flex-end;justify-content:center;padding:0}
+@media(min-width:600px){.modal-overlay{align-items:center;padding:20px}}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:24px 24px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:24px 20px 32px;position:relative;animation:slideUp .25s ease}
+@media(min-width:600px){.modal{border-radius:24px;max-width:480px;max-height:90vh}}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:40px;height:4px;background:var(--border3);border-radius:2px;margin:0 auto 20px}
+@media(min-width:600px){.modal-handle{display:none}}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--surface2);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:20px;line-height:1;transition:all .2s}
+.modal-close:hover{color:var(--text);border-color:var(--border3)}
+.modal-num{font-size:11px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--text);margin-bottom:3px}
+.modal-vi{font-size:14px;color:var(--gold);margin-bottom:8px}
+.modal-keys{font-size:13px;color:var(--muted);margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.modal-section{margin-bottom:14px}
+.modal-section h4{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:5px}
+.modal-section p{font-size:14px;color:var(--text2);line-height:1.65}
+.modal-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.meta-pill{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11px;color:var(--muted)}
+.meta-pill span{display:block;font-size:12px;color:var(--text);margin-top:2px}
+
+/* ─── ADMIN ─── */
+#screen-admin{padding-bottom:20px}
+.admin-header{background:var(--surface);border-bottom:1px solid var(--border2);padding:16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.admin-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold)}
+.admin-body{padding:16px;max-width:900px;margin:0 auto}
+.admin-section{background:var(--surface);border:1.5px solid var(--border2);border-radius:16px;padding:18px;margin-bottom:16px}
+.admin-section h3{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:14px}
+.user-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.user-row:last-child{border-bottom:none}
+.user-info{flex:1;min-width:0}
+.user-email{font-size:13px;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.status-badge{font-size:10px;padding:3px 8px;border-radius:999px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.status-pending{background:color-mix(in srgb,var(--amber) 15%,transparent);color:var(--amber);border:1px solid color-mix(in srgb,var(--amber) 30%,transparent)}
+.status-approved{background:color-mix(in srgb,var(--green) 15%,transparent);color:var(--green);border:1px solid color-mix(in srgb,var(--green) 30%,transparent)}
+.status-denied{background:color-mix(in srgb,var(--red) 15%,transparent);color:var(--red);border:1px solid color-mix(in srgb,var(--red) 30%,transparent)}
+.status-locked{background:color-mix(in srgb,var(--muted) 15%,transparent);color:var(--muted);border:1px solid color-mix(in srgb,var(--muted) 30%,transparent)}
+.user-actions{display:flex;gap:6px;flex-shrink:0}
+.act-btn{border:1.5px solid var(--border2);border-radius:7px;padding:5px 10px;font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;background:var(--surface2);color:var(--muted)}
+.act-btn.approve{border-color:color-mix(in srgb,var(--green) 40%,transparent);color:var(--green)}
+.act-btn.deny{border-color:color-mix(in srgb,var(--red) 40%,transparent);color:var(--red)}
+.act-btn.lock{border-color:color-mix(in srgb,var(--amber) 40%,transparent);color:var(--amber)}
+.act-btn.del{border-color:color-mix(in srgb,var(--red) 40%,transparent);color:var(--red)}
+.act-btn:hover{opacity:.8}
+.admin-form{display:flex;flex-direction:column;gap:10px}
+.admin-input{background:var(--surface2);border:1.5px solid var(--border2);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;width:100%;transition:border .2s}
+.admin-input:focus{border-color:var(--gold)}
+.admin-select{background:var(--surface2);border:1.5px solid var(--border2);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;width:100%;transition:border .2s;cursor:pointer}
+.btn-small{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1208;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:opacity .2s}
+.btn-small:hover{opacity:.88}
+.access-modal{background:var(--surface2);border-radius:12px;padding:14px;margin-top:10px}
+.access-modal label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);padding:5px 0;cursor:pointer}
+.access-modal input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold)}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom) + 12px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface3);border:1px solid var(--border2);border-radius:12px;padding:10px 20px;font-size:13px;color:var(--text);box-shadow:var(--shadow);opacity:0;transition:all .3s;z-index:800;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:color-mix(in srgb,var(--green) 50%,transparent);color:var(--green)}
+.toast.error{border-color:color-mix(in srgb,var(--red) 50%,transparent);color:var(--red)}
+
+/* ─── EMPTY STATE ─── */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-icon{font-size:40px;margin-bottom:10px}
+.empty p{font-size:13px}
+
+/* ─── LOADING ─── */
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:16px}
+.loading-screen .sigil{font-size:48px}
+
+/* ─── ACCESS DENIED ─── */
+.locked-panel{display:flex;align-items:center;justify-content:center;min-height:200px;flex-direction:column;gap:12px;color:var(--muted);text-align:center;padding:20px}
+.locked-panel .lock-icon{font-size:36px}
+.locked-panel p{font-size:14px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- ══════ LOADING ══════ -->
+<div id="screen-loading" class="screen active">
+  <div class="loading-screen">
+    <div class="sigil">✦</div>
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<!-- ══════ LOGIN ══════ -->
+<div id="screen-login" class="screen">
+  <button class="theme-toggle-login" onclick="toggleTheme()" style="position:fixed;top:16px;right:16px;z-index:10">🌙</button>
+  <div class="login-card">
+    <div class="sigil">✦</div>
+    <div class="login-title">Hệ Thống Tra Cứu Bài</div>
+    <div class="login-sub">T-SHARE · Bioverify</div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="l-user" placeholder="email@example.com" autocomplete="email"/>
+    </div>
+    <div class="field">
+      <label>Mật khẩu</label>
+      <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+    <div class="err-msg" id="l-err">⚠ Sai tài khoản hoặc mật khẩu</div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">Đăng nhập</button>
+  </div>
+</div>
+
+<!-- ══════ MEMBER CODE ══════ -->
+<div id="screen-code" class="screen">
+  <div class="code-card">
+    <div class="sigil">✦</div>
+    <div class="code-welcome">Xin chào!</div>
+    <div class="code-user" id="code-user-email"></div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Vui lòng nhập <strong style="color:var(--text)">Mã Thành Viên</strong> để truy cập nội dung</p>
+    <input class="code-input" id="member-code-input" placeholder="Nhập mã thành viên..." autocomplete="off" spellcheck="false"/>
+    <div class="err-msg" id="code-err">⚠ Mã không hợp lệ</div>
+    <button class="btn-primary" onclick="submitMemberCode()">Xác nhận</button>
+    <button class="btn-logout" onclick="doLogout()">Đăng xuất</button>
+  </div>
+</div>
+
+<!-- ══════ PENDING APPROVAL ══════ -->
+<div id="screen-pending" class="screen">
+  <div class="pending-card">
+    <div class="pending-icon">⏳</div>
+    <div class="pending-title">Đang chờ xét duyệt</div>
+    <div class="pending-desc">Tài khoản của bạn đang chờ admin xét duyệt. Vui lòng chờ thông báo phê duyệt.</div>
+    <button class="btn-primary" onclick="checkApprovalStatus()" style="margin-bottom:10px">Kiểm tra trạng thái</button>
+    <button class="btn-logout" onclick="doLogout()">Đăng xuất</button>
+  </div>
+</div>
+
+<!-- ══════ ERROR SCREEN ══════ -->
+<div id="screen-error" class="screen" style="align-items:center;justify-content:center;padding:20px">
+  <div class="pending-card error-card" style="text-align:center">
+    <div class="pending-icon">🚫</div>
+    <div class="error-title">Truy cập bị từ chối</div>
+    <div class="pending-desc" id="error-desc">Tài khoản của bạn đã bị từ chối. Liên hệ admin để biết thêm chi tiết.</div>
+    <button class="btn-logout" onclick="doLogout()">Đăng xuất</button>
+  </div>
+</div>
+
+<!-- ══════ MAIN APP ══════ -->
+<div id="screen-app" class="screen">
+  <div class="app-header">
+    <div class="app-header-left">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold)">✦</div>
+      <div class="app-logo">T-SHARE <span>TRA CỨU BÀI</span></div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="toggleTheme()" id="theme-btn" title="Đổi giao diện">🌙</button>
+      <button class="icon-btn" onclick="doLogout()" title="Đăng xuất">↩</button>
+    </div>
+  </div>
+
+  <!-- Panels -->
+  <div id="panel-tay" class="panel active">
+    <div class="search-bar"><span class="search-icon">🔍</span><input id="tay-search" placeholder="Tìm lá bài Tây..."/></div>
+    <div class="chips" id="tay-suits">
+      <div class="chip active" data-suit="all">Tất cả</div>
+      <div class="chip" data-suit="Cơ">♥ Cơ</div>
+      <div class="chip" data-suit="Rô">♦ Rô</div>
+      <div class="chip" data-suit="Chuồn">♣ Chuồn</div>
+      <div class="chip" data-suit="Bích">♠ Bích</div>
+    </div>
+    <div class="cards-grid" id="tay-grid"></div>
+  </div>
+
+  <div id="panel-tarot" class="panel">
+    <div class="search-bar"><span class="search-icon">🔍</span><input id="tarot-search" placeholder="Tìm lá Tarot..."/></div>
+    <div class="chips" id="tarot-filters">
+      <div class="chip active" data-tf="all">Tất cả</div>
+      <div class="chip" data-tf="major">Major</div>
+      <div class="chip" data-tf="wands">Wands</div>
+      <div class="chip" data-tf="cups">Cups</div>
+      <div class="chip" data-tf="swords">Swords</div>
+      <div class="chip" data-tf="pentacles">Pentacles</div>
+    </div>
+    <div class="cards-grid" id="tarot-grid"></div>
+  </div>
+
+  <div id="panel-lenormand" class="panel">
+    <div class="search-bar"><span class="search-icon">🔍</span><input id="len-search" placeholder="Tìm Lenormand..."/></div>
+    <div class="len-grid" id="len-grid"></div>
+  </div>
+
+  <div id="panel-yesno" class="panel">
+    <div style="margin-bottom:16px">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--text);margin-bottom:4px">Bài Tây Yes / No</div>
+      <div style="font-size:12px;color:var(--muted)">Tra cứu ý nghĩa số bài</div>
+    </div>
+    <div class="yn-grid">
+      <div class="yn-card yn-yes"><div class="yn-nums">Q · K · A</div><div class="yn-result">✅ <strong>Có — Chắc chắn</strong></div></div>
+      <div class="yn-card yn-wait"><div class="yn-nums">2 · 3 · 4</div><div class="yn-result">⏳ <strong>Chờ đợi</strong> — Sớm muộn cũng có</div></div>
+      <div class="yn-card yn-chat"><div class="yn-nums">5 · 6 · 7 · 8</div><div class="yn-result">💬 <strong>Đang đàm phán</strong> / Đang nói</div></div>
+      <div class="yn-card yn-soon"><div class="yn-nums">9 · 10</div><div class="yn-result">🌙 <strong>Sắp có kết quả</strong></div></div>
+    </div>
+    <div class="yn-guide">
+      <h4>Hướng dẫn</h4>
+      <ul>
+        <li>Xáo bài và rút 1 lá cho câu hỏi Yes/No</li>
+        <li>Nhìn vào số của lá bài (A=1, J=11, Q=12, K=13)</li>
+        <li>Tra vào bảng trên để xem đáp án</li>
+        <li>Chất bài bổ sung thêm sắc thái</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-panel="tay" onclick="switchPanel('tay',this)">
+      <div class="nav-icon">♠</div><span>Bài Tây</span>
+    </div>
+    <div class="nav-item" data-panel="tarot" onclick="switchPanel('tarot',this)">
+      <div class="nav-icon">🔮</div><span>Tarot</span>
+    </div>
+    <div class="nav-item" data-panel="lenormand" onclick="switchPanel('lenormand',this)">
+      <div class="nav-icon">🌿</div><span>Lenormand</span>
+    </div>
+    <div class="nav-item" data-panel="yesno" onclick="switchPanel('yesno',this)">
+      <div class="nav-icon">⚖️</div><span>Yes/No</span>
+    </div>
+  </nav>
+</div>
+
+<!-- ══════ ADMIN ══════ -->
+<div id="screen-admin" class="screen">
+  <div class="admin-header">
+    <div>
+      <div class="admin-title">⚙ Admin Panel</div>
+      <div style="font-size:11px;color:var(--muted)">T-SHARE · Bioverify</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+      <button class="icon-btn" onclick="doLogout()">↩</button>
+    </div>
+  </div>
+  <div class="admin-body">
+    <!-- Create account -->
+    <div class="admin-section">
+      <h3>➕ Tạo tài khoản mới</h3>
+      <div class="admin-form">
+        <input class="admin-input" id="new-email" type="email" placeholder="Email người dùng"/>
+        <input class="admin-input" id="new-pass" type="password" placeholder="Mật khẩu"/>
+        <select class="admin-select" id="new-access">
+          <option value="all">🌟 Full Access (Tất cả)</option>
+          <option value="tay">♠ Bài Tây only</option>
+          <option value="tarot">🔮 Tarot only</option>
+          <option value="lenormand">🌿 Lenormand only</option>
+        </select>
+        <button class="btn-small" onclick="adminCreateUser()">Tạo tài khoản</button>
+      </div>
+    </div>
+
+    <!-- Pending approvals -->
+    <div class="admin-section">
+      <h3>⏳ Chờ xét duyệt (<span id="pending-count">0</span>)</h3>
+      <div id="pending-list"><div class="empty"><div class="empty-icon">✓</div><p>Không có yêu cầu nào</p></div></div>
+    </div>
+
+    <!-- All users -->
+    <div class="admin-section">
+      <h3>👥 Danh sách người dùng</h3>
+      <div id="users-list"><div class="empty"><div class="empty-icon">👤</div><p>Đang tải...</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ MODAL ══════ -->
+<div class="modal-overlay" id="modal" onclick="closeModalIf(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════
+   FIREBASE INIT
+══════════════════════════════════════ */
+const firebaseConfig={
+  apiKey:"AIzaSyDtAU-Iqn-u39_mgkxRZ3fIF_Kyxqn-Gyg",
+  authDomain:"csdl-bio.firebaseapp.com",
+  databaseURL:"https://csdl-bio-default-rtdb.firebaseio.com",
+  projectId:"csdl-bio",
+  storageBucket:"csdl-bio.firebasestorage.app",
+  messagingSenderId:"568258817515",
+  appId:"1:568258817515:web:e5b7d7a0b42b25baa63dae",
+  measurementId:"G-PL5TNK82S6"
+};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+const auth=firebase.auth();
+
+// Admin email
+const ADMIN_EMAIL='bioverify@gmail.com';
+const SUPERUSER_EMAIL='congthanh.edu.vn';
+
+// Member code → access map (these are the codes users enter after login)
+const MEMBER_CODES={
+  'L9pHo3':'tay',
+  'CTEDU':'tarot',
+  'T-SHARE':'lenormand',
+};
+
+let currentUser=null;
+let currentAccess=null; // 'all','tay','tarot','lenormand'
+let isAdmin=false;
+
+/* ══════════════════════════════════════
+   THEME
+══════════════════════════════════════ */
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  document.querySelectorAll('#theme-btn,.theme-toggle-login').forEach(b=>b.textContent=isDark?'🌙':'☀️');
+  localStorage.setItem('theme',isDark?'light':'dark');
+}
+(function(){
+  const saved=localStorage.getItem('theme')||'dark';
+  document.documentElement.setAttribute('data-theme',saved);
+  document.querySelectorAll('#theme-btn,.theme-toggle-login').forEach(b=>b.textContent=saved==='dark'?'☀️':'🌙');
+})();
+
+/* ══════════════════════════════════════
+   SCREEN MANAGEMENT
+══════════════════════════════════════ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active')});
+  const s=document.getElementById('screen-'+id);
+  if(s)s.classList.add('active');
+}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+let toastTimer;
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast '+(type?type:'');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+/* ══════════════════════════════════════
+   AUTH
+══════════════════════════════════════ */
+async function doLogin(){
+  const email=document.getElementById('l-user').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  const btn=document.getElementById('login-btn');
+  const err=document.getElementById('l-err');
+  err.style.display='none';
+  btn.textContent='Đang đăng nhập...';btn.disabled=true;
+  try{
+    await auth.signInWithEmailAndPassword(email,pass);
+  }catch(e){
+    err.style.display='block';
+    btn.textContent='Đăng nhập';btn.disabled=false;
+  }
+}
+document.getElementById('l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+
+async function doLogout(){
+  await auth.signOut();
+  currentUser=null;currentAccess=null;isAdmin=false;
+  showScreen('login');
+}
+
+/* ══════════════════════════════════════
+   FIREBASE AUTH STATE
+══════════════════════════════════════ */
+auth.onAuthStateChanged(async user=>{
+  if(!user){showScreen('login');return;}
+  currentUser=user;
+  const email=user.email;
+
+  // Admin
+  if(email===ADMIN_EMAIL){
+    isAdmin=true;
+    showScreen('admin');
+    loadAdminData();
+    return;
+  }
+
+  // Super user (full access, no code needed)
+  if(email===SUPERUSER_EMAIL){
+    currentAccess='all';
+    showScreen('app');
+    renderAll();
+    return;
+  }
+
+  // Check firebase for user record
+  const snap=await db.ref('users/'+sanitizeEmail(email)).once('value');
+  const userData=snap.val();
+
+  if(!userData){
+    // New user — create pending record
+    await db.ref('users/'+sanitizeEmail(email)).set({
+      email,status:'pending',access:'none',createdAt:Date.now(),memberCode:''
+    });
+    showScreen('pending');
+    return;
+  }
+
+  if(userData.status==='denied'){
+    document.getElementById('error-desc').textContent='Tài khoản của bạn đã bị từ chối. Liên hệ admin để biết thêm.';
+    showScreen('error');return;
+  }
+  if(userData.status==='locked'){
+    document.getElementById('error-desc').textContent='Tài khoản của bạn đã bị khóa. Liên hệ admin.';
+    showScreen('error');return;
+  }
+  if(userData.status==='pending'){
+    showScreen('pending');return;
+  }
+  if(userData.status==='approved'){
+    currentAccess=userData.access||'none';
+    // If no member code set yet, ask for code
+    if(!userData.memberCode&&currentAccess==='none'){
+      document.getElementById('code-user-email').textContent=email;
+      showScreen('code');
+    } else {
+      showScreen('app');
+      renderAll();
+    }
+    return;
+  }
+
+  // Default: show code screen
+  document.getElementById('code-user-email').textContent=email;
+  showScreen('code');
+});
+
+function sanitizeEmail(email){
+  return email.replace(/\./g,'_').replace(/@/g,'_at_');
+}
+
+/* ══════════════════════════════════════
+   MEMBER CODE
+══════════════════════════════════════ */
+async function submitMemberCode(){
+  const code=document.getElementById('member-code-input').value.trim();
+  const err=document.getElementById('code-err');
+  err.style.display='none';
+
+  const access=MEMBER_CODES[code];
+  if(!access){err.style.display='block';return;}
+
+  const email=currentUser.email;
+  const key=sanitizeEmail(email);
+  const snap=await db.ref('users/'+key).once('value');
+  const existing=snap.val();
+
+  await db.ref('users/'+key).set({
+    email,
+    status: existing&&existing.status==='approved'?'approved':'pending',
+    access: existing&&existing.status==='approved'?(existing.access||access):access,
+    memberCode:code,
+    createdAt:existing?existing.createdAt:Date.now(),
+    requestedAt:Date.now()
+  });
+
+  if(existing&&existing.status==='approved'){
+    currentAccess=existing.access||access;
+    showScreen('app');renderAll();
+  } else {
+    showScreen('pending');
+  }
+}
+
+async function checkApprovalStatus(){
+  const snap=await db.ref('users/'+sanitizeEmail(currentUser.email)).once('value');
+  const d=snap.val();
+  if(d&&d.status==='approved'){
+    currentAccess=d.access||'none';
+    showScreen('app');renderAll();
+    showToast('✅ Đã được phê duyệt!','success');
+  } else if(d&&d.status==='denied'){
+    showScreen('error');
+  } else {
+    showToast('⏳ Vẫn đang chờ phê duyệt...','');
+  }
+}
+
+/* ══════════════════════════════════════
+   PANEL SWITCHING
+══════════════════════════════════════ */
+function switchPanel(name,el){
+  // Check access
+  const allowed=canAccess(name);
+  if(!allowed){
+    showLockedPanel(name);
+    return;
+  }
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if(el)el.classList.add('active');
+}
+
+function canAccess(panelName){
+  if(currentAccess==='all')return true;
+  if(panelName==='yesno')return currentAccess==='tay'||currentAccess==='all';
+  return currentAccess===panelName;
+}
+
+function showLockedPanel(name){
+  const panel=document.getElementById('panel-'+name);
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  panel.classList.add('active');
+  panel.innerHTML=`<div class="locked-panel"><div class="lock-icon">🔒</div><p>Bạn không có quyền truy cập mục này.<br>Liên hệ admin để mở khóa.</p></div>`;
+}
+
+/* ══════════════════════════════════════
+   ADMIN FUNCTIONS
+══════════════════════════════════════ */
+function loadAdminData(){
+  // Real-time listener
+  db.ref('users').on('value',snap=>{
+    const users=snap.val()||{};
+    renderAdminUsers(users);
+  });
+}
+
+function renderAdminUsers(users){
+  const pending=[];const all=[];
+  Object.values(users).forEach(u=>{
+    all.push(u);
+    if(u.status==='pending')pending.push(u);
+  });
+  document.getElementById('pending-count').textContent=pending.length;
+
+  // Pending
+  const pList=document.getElementById('pending-list');
+  if(pending.length===0){
+    pList.innerHTML='<div class="empty"><div class="empty-icon">✓</div><p>Không có yêu cầu nào</p></div>';
+  } else {
+    pList.innerHTML=pending.map(u=>userRowHTML(u,true)).join('');
+  }
+
+  // All users
+  const uList=document.getElementById('users-list');
+  if(all.length===0){
+    uList.innerHTML='<div class="empty"><div class="empty-icon">👤</div><p>Chưa có người dùng</p></div>';
+  } else {
+    uList.innerHTML=all.map(u=>userRowHTML(u,false)).join('');
+  }
+}
+
+function userRowHTML(u,compact){
+  const statusLabel={pending:'Chờ duyệt',approved:'Đã duyệt',denied:'Từ chối',locked:'Bị khóa'};
+  const statusClass={pending:'status-pending',approved:'status-approved',denied:'status-denied',locked:'status-locked'};
+  const accessLabel={all:'Full',tay:'Bài Tây',tarot:'Tarot',lenormand:'Lenormand',none:'Chưa rõ'};
+  const key=sanitizeEmail(u.email);
+  let actions='';
+  if(u.status==='pending'){
+    actions=`
+      <button class="act-btn approve" onclick="adminApprove('${key}','${u.email}')">✓ Duyệt</button>
+      <button class="act-btn deny" onclick="adminDeny('${key}')">✗ Từ chối</button>`;
+  } else if(u.status==='approved'){
+    actions=`
+      <button class="act-btn lock" onclick="adminLock('${key}')">🔒 Khóa</button>
+      <button class="act-btn del" onclick="adminDelete('${key}')">🗑</button>`;
+  } else {
+    actions=`
+      <button class="act-btn approve" onclick="adminApprove('${key}','${u.email}')">↩ Mở</button>
+      <button class="act-btn del" onclick="adminDelete('${key}')">🗑</button>`;
+  }
+  return `<div class="user-row">
+    <div class="user-info">
+      <div class="user-email">${u.email}</div>
+      <div class="user-meta">
+        <span class="status-badge ${statusClass[u.status]||'status-pending'}">${statusLabel[u.status]||'?'}</span>
+        <span style="margin-left:6px;font-size:11px;color:var(--muted)">Mã: ${u.memberCode||'—'} · Quyền: ${accessLabel[u.access]||'—'}</span>
+      </div>
+    </div>
+    <div class="user-actions" style="flex-wrap:wrap;justify-content:flex-end">
+      <button class="act-btn" onclick="adminEditAccess('${key}','${u.email}','${u.access||'all'}')">✏ Quyền</button>
+      ${actions}
+    </div>
+  </div>`;
+}
+
+async function adminApprove(key,email){
+  // Show access picker
+  const access=await promptAccess();
+  if(!access)return;
+  await db.ref('users/'+key).update({status:'approved',access,approvedAt:Date.now()});
+  showToast('✅ Đã phê duyệt: '+email,'success');
+}
+
+async function adminDeny(key){
+  if(!confirm('Từ chối tài khoản này?'))return;
+  await db.ref('users/'+key).update({status:'denied'});
+  showToast('Đã từ chối','error');
+}
+
+async function adminLock(key){
+  await db.ref('users/'+key).update({status:'locked'});
+  showToast('Đã khóa tài khoản');
+}
+
+async function adminDelete(key){
+  if(!confirm('Xóa tài khoản này? Không thể hoàn tác!'))return;
+  await db.ref('users/'+key).remove();
+  showToast('Đã xóa tài khoản');
+}
+
+async function adminEditAccess(key,email,currentAcc){
+  openModal(`
+    <div class="modal-num">Chỉnh quyền truy cập</div>
+    <div class="modal-title" style="font-size:18px">${email}</div>
+    <div style="height:1px;background:var(--border);margin:12px 0"></div>
+    <div class="access-modal">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Chọn quyền truy cập:</p>
+      <select class="admin-select" id="access-picker">
+        <option value="all" ${currentAcc==='all'?'selected':''}>🌟 Full Access</option>
+        <option value="tay" ${currentAcc==='tay'?'selected':''}>♠ Bài Tây only</option>
+        <option value="tarot" ${currentAcc==='tarot'?'selected':''}>🔮 Tarot only</option>
+        <option value="lenormand" ${currentAcc==='lenormand'?'selected':''}>🌿 Lenormand only</option>
+      </select>
+    </div>
+    <button class="btn-small" style="width:100%;margin-top:14px" onclick="saveAccess('${key}')">Lưu</button>
+  `);
+}
+
+async function saveAccess(key){
+  const val=document.getElementById('access-picker').value;
+  await db.ref('users/'+key).update({access:val});
+  closeModal();
+  showToast('✅ Đã cập nhật quyền','success');
+}
+
+async function adminCreateUser(){
+  const email=document.getElementById('new-email').value.trim();
+  const pass=document.getElementById('new-pass').value;
+  const access=document.getElementById('new-access').value;
+  if(!email||!pass){showToast('Vui lòng điền đủ thông tin','error');return;}
+
+  try{
+    // Create in Auth
+    const cred=await auth.createUserWithEmailAndPassword(email,pass);
+    // Save to DB
+    await db.ref('users/'+sanitizeEmail(email)).set({
+      email,status:'approved',access,memberCode:'admin-created',createdAt:Date.now()
+    });
+    // Sign back in as admin
+    await auth.signInWithEmailAndPassword(ADMIN_EMAIL, document.getElementById('l-pass').value||'Thanh123@');
+    document.getElementById('new-email').value='';
+    document.getElementById('new-pass').value='';
+    showToast('✅ Đã tạo tài khoản: '+email,'success');
+  }catch(e){
+    showToast('Lỗi: '+e.message,'error');
+  }
+}
+
+// Simple access prompter using a confirm dialog approach
+function promptAccess(){
+  return new Promise(resolve=>{
+    openModal(`
+      <div class="modal-num">Phê duyệt tài khoản</div>
+      <div class="modal-title" style="font-size:18px">Chọn quyền truy cập</div>
+      <div style="height:1px;background:var(--border);margin:12px 0"></div>
+      <select class="admin-select" id="prompt-access" style="margin-bottom:14px">
+        <option value="all">🌟 Full Access (Tất cả)</option>
+        <option value="tay">♠ Bài Tây only</option>
+        <option value="tarot">🔮 Tarot only</option>
+        <option value="lenormand">🌿 Lenormand only</option>
+      </select>
+      <button class="btn-small" style="width:100%" onclick="
+        const v=document.getElementById('prompt-access').value;
+        closeModal();
+        window._promptAccessResolve(v);
+      ">Xác nhận</button>
+    `);
+    window._promptAccessResolve=resolve;
+  });
+}
+
+/* ══════════════════════════════════════
+   MODAL
+══════════════════════════════════════ */
+function openModal(html){
+  document.getElementById('modal-content').innerHTML=html;
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function closeModalIf(e){if(e.target===document.getElementById('modal'))closeModal()}
+
+/* ══════════════════════════════════════
+   DATA & RENDERING
+══════════════════════════════════════ */
+function renderAll(){
+  renderTay();renderTarot();renderLen();
+  // Apply access locks
+  ['tarot','lenormand'].forEach(name=>{
+    if(!canAccess(name)){
+      const nav=document.querySelector(`.nav-item[data-panel="${name}"]`);
+      if(nav)nav.style.opacity='.4';
+    }
+  });
+  showScreen('app');
+}
+
+/* ─ BÀI TÂY DATA ─ */
+const tayData=[
+  {name:'Át Cơ',suit:'Cơ',desc:'Tình yêu mãnh liệt, khởi đầu mới, tin vui trong tình cảm.'},
+  {name:'K Cơ',suit:'Cơ',desc:'Người đàn ông mạnh mẽ, tốt bụng, đáng tin cậy.'},
+  {name:'Q Cơ',suit:'Cơ',desc:'Người phụ nữ hiền lành, ấm áp, giàu tình cảm.'},
+  {name:'J Cơ',suit:'Cơ',desc:'Người trẻ tuổi nhiệt huyết, mang lại may mắn.'},
+  {name:'10 Cơ',suit:'Cơ',desc:'Hạnh phúc viên mãn, gia đình đoàn tụ.'},
+  {name:'9 Cơ',suit:'Cơ',desc:'Niềm vui và sự hài lòng, ước nguyện thành hiện thực.'},
+  {name:'8 Cơ',suit:'Cơ',desc:'Gia đình, tổ ấm, sự bình yên nội tâm.'},
+  {name:'7 Cơ',suit:'Cơ',desc:'Lãng mạn mới nở, rung động đầu đời.'},
+  {name:'6 Cơ',suit:'Cơ',desc:'Hòa thuận trong mối quan hệ, quá khứ đẹp.'},
+  {name:'5 Cơ',suit:'Cơ',desc:'Giao tiếp và hẹn hò, kết nối xã hội.'},
+  {name:'4 Cơ',suit:'Cơ',desc:'Hạnh phúc gia đình, nền tảng vững chắc.'},
+  {name:'3 Cơ',suit:'Cơ',desc:'Khởi đầu mối quan hệ, tình cảm mới chớm nở.'},
+  {name:'2 Cơ',suit:'Cơ',desc:'Cam kết, hôn nhân, sự kết hợp hai tâm hồn.'},
+  {name:'Át Rô',suit:'Rô',desc:'Khởi đầu mới về tài chính, tin vui tiền bạc.'},
+  {name:'K Rô',suit:'Rô',desc:'Người đàn ông giàu có, thành đạt, thực tế.'},
+  {name:'Q Rô',suit:'Rô',desc:'Người phụ nữ thực tế, khéo léo tài chính.'},
+  {name:'J Rô',suit:'Rô',desc:'Người trẻ tiềm năng, đầy tham vọng.'},
+  {name:'10 Rô',suit:'Rô',desc:'Thành công lớn về tài chính, dồi dào của cải.'},
+  {name:'9 Rô',suit:'Rô',desc:'Thành công đầu tư, lợi nhuận tốt.'},
+  {name:'8 Rô',suit:'Rô',desc:'Tin tức tài chính tích cực, giao dịch thuận lợi.'},
+  {name:'7 Rô',suit:'Rô',desc:'Cơ hội mới về tiền bạc, bước ngoặt nghề nghiệp.'},
+  {name:'6 Rô',suit:'Rô',desc:'Công việc ổn định, thu nhập đều đặn.'},
+  {name:'5 Rô',suit:'Rô',desc:'Cơ hội nhỏ, cần nắm bắt nhanh.'},
+  {name:'4 Rô',suit:'Rô',desc:'Ổn định tài chính, nền tảng vật chất vững.'},
+  {name:'3 Rô',suit:'Rô',desc:'Dự án mới khởi động, hợp tác kinh doanh.'},
+  {name:'2 Rô',suit:'Rô',desc:'Hợp tác tài chính, chia sẻ lợi ích.'},
+  {name:'Át Chuồn',suit:'Chuồn',desc:'Tham vọng lớn, cơ hội vàng trong sự nghiệp.'},
+  {name:'K Chuồn',suit:'Chuồn',desc:'Người đàn ông thông minh, lý trí, có tầm ảnh hưởng.'},
+  {name:'Q Chuồn',suit:'Chuồn',desc:'Người phụ nữ sáng tạo, cởi mở, tiến bộ.'},
+  {name:'J Chuồn',suit:'Chuồn',desc:'Người trẻ năng động, học hỏi nhanh.'},
+  {name:'10 Chuồn',suit:'Chuồn',desc:'Thành công công việc, đỉnh cao sự nghiệp.'},
+  {name:'9 Chuồn',suit:'Chuồn',desc:'Thành tựu dự án, kết quả xứng đáng.'},
+  {name:'8 Chuồn',suit:'Chuồn',desc:'Nỗ lực được đền đáp, bứt phá vươn lên.'},
+  {name:'7 Chuồn',suit:'Chuồn',desc:'Cải thiện kỹ năng, tự hoàn thiện bản thân.'},
+  {name:'6 Chuồn',suit:'Chuồn',desc:'Chăm chỉ làm việc, kết quả dần hiện ra.'},
+  {name:'5 Chuồn',suit:'Chuồn',desc:'Đổi mới tư duy, thử nghiệm hướng đi mới.'},
+  {name:'4 Chuồn',suit:'Chuồn',desc:'Ổn định công việc, môi trường làm việc tốt.'},
+  {name:'3 Chuồn',suit:'Chuồn',desc:'Dự án mới có tiềm năng.'},
+  {name:'2 Chuồn',suit:'Chuồn',desc:'Hợp tác hiệu quả, cộng tác cùng nhau.'},
+  {name:'Át Bích',suit:'Bích',desc:'Kết thúc hoặc chuyển đổi lớn, thử thách quan trọng.'},
+  {name:'K Bích',suit:'Bích',desc:'Người đàn ông cứng rắn, khó tiếp cận.'},
+  {name:'Q Bích',suit:'Bích',desc:'Người phụ nữ gây mâu thuẫn, cần cẩn trọng.'},
+  {name:'J Bích',suit:'Bích',desc:'Người trẻ gây rắc rối, thiếu chín chắn.'},
+  {name:'10 Bích',suit:'Bích',desc:'Khó khăn lớn, áp lực từ nhiều phía.'},
+  {name:'9 Bích',suit:'Bích',desc:'Căng thẳng, lo âu, cần tìm hỗ trợ.'},
+  {name:'8 Bích',suit:'Bích',desc:'Tin buồn, trì hoãn, bế tắc tạm thời.'},
+  {name:'7 Bích',suit:'Bích',desc:'Bất an, không chắc chắn, cần thận trọng.'},
+  {name:'6 Bích',suit:'Bích',desc:'Thử thách đang đến, cần chuẩn bị kỹ.'},
+  {name:'5 Bích',suit:'Bích',desc:'Áp lực, mâu thuẫn, cần giải quyết dứt điểm.'},
+  {name:'4 Bích',suit:'Bích',desc:'Trì hoãn, thời gian chờ đợi kéo dài.'},
+  {name:'3 Bích',suit:'Bích',desc:'Mâu thuẫn nhỏ, hiểu lầm cần làm rõ.'},
+  {name:'2 Bích',suit:'Bích',desc:'Chia tay, kết thúc mối quan hệ.'},
+];
+const suitIcons={Cơ:'♥',Rô:'♦',Chuồn:'♣',Bích:'♠'};
+let tayCurrentSuit='all';
+
+function renderTay(){
+  const q=document.getElementById('tay-search').value.toLowerCase();
+  const grid=document.getElementById('tay-grid');
+  const filtered=tayData.filter(c=>(tayCurrentSuit==='all'||c.suit===tayCurrentSuit)&&c.name.toLowerCase().includes(q));
+  grid.innerHTML=filtered.length?filtered.map(c=>`
+    <div class="card-item" onclick='openTayModal(${JSON.stringify(c)})'>
+      <div class="card-suit">${suitIcons[c.suit]} ${c.suit}</div>
+      <div class="card-name">${c.name}</div>
+      <div class="card-keys">${c.desc}</div>
+    </div>`).join(''):'<div class="empty" style="grid-column:1/-1"><p>Không tìm thấy</p></div>';
+}
+
+function openTayModal(c){
+  openModal(`
+    <div class="modal-num">${suitIcons[c.suit]} ${c.suit}</div>
+    <div class="modal-title">${c.name}</div>
+    <div style="height:1px;background:var(--border);margin:12px 0"></div>
+    <div class="modal-section"><h4>Ý nghĩa</h4><p>${c.desc}</p></div>`);
+}
+
+document.getElementById('tay-search').addEventListener('input',renderTay);
+document.querySelectorAll('#tay-suits .chip').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#tay-suits .chip').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');tayCurrentSuit=btn.dataset.suit;renderTay();
+  });
+});
+
+/* ─ TAROT DATA ─ */
+const tarotCards=[
+  {name:"The Fool",nameVi:"Kẻ Ngốc",number:"0",suit:"major",keywords:"Khởi đầu mới, Hồn nhiên, Tự do, Mạo hiểm",uprightMeaning:"Bắt đầu hành trình mới, tinh thần phiêu lưu, sẵn sàng đón nhận những điều chưa biết.",reversedMeaning:"Hành động thiếu suy nghĩ, liều lĩnh, không chuẩn bị kỹ.",element:"Không khí",astrology:"Thiên Vương tinh"},
+  {name:"The Magician",nameVi:"Nhà Ảo Thuật",number:"I",suit:"major",keywords:"Sức mạnh, Kỹ năng, Tập trung, Hành động",uprightMeaning:"Bạn có đủ nguồn lực để biến ước mơ thành hiện thực. Tập trung và thể hiện khả năng.",reversedMeaning:"Thiếu tập trung, lãng phí tài năng.",element:"Không khí",astrology:"Sao Thủy"},
+  {name:"The High Priestess",nameVi:"Nữ Tư Tế Tối Cao",number:"II",suit:"major",keywords:"Trực giác, Bí ẩn, Tiềm thức, Tri thức",uprightMeaning:"Lắng nghe tiếng nói bên trong, tin vào trực giác. Có điều chưa được tiết lộ.",reversedMeaning:"Bỏ qua trực giác, bí mật bị phơi bày.",element:"Nước",astrology:"Mặt trăng"},
+  {name:"The Empress",nameVi:"Nữ Hoàng",number:"III",suit:"major",keywords:"Sinh sản, Nuôi dưỡng, Dồi dào, Vẻ đẹp",uprightMeaning:"Giai đoạn sinh sôi và thịnh vượng. Sự nuôi dưỡng mang lại kết quả tích cực.",reversedMeaning:"Phụ thuộc quá mức, bỏ bê bản thân.",element:"Đất",astrology:"Sao Kim"},
+  {name:"The Emperor",nameVi:"Hoàng Đế",number:"IV",suit:"major",keywords:"Quyền lực, Cấu trúc, Kỷ luật, Ổn định",uprightMeaning:"Thiết lập trật tự và cấu trúc, lãnh đạo tự tin.",reversedMeaning:"Độc đoán, cứng nhắc, lạm dụng quyền lực.",element:"Lửa",astrology:"Bạch Dương"},
+  {name:"The Hierophant",nameVi:"Giáo Hoàng",number:"V",suit:"major",keywords:"Truyền thống, Giáo dục, Niềm tin, Tuân thủ",uprightMeaning:"Học hỏi từ truyền thống, tìm kiếm hướng dẫn tâm linh.",reversedMeaning:"Phản kháng truyền thống, tư duy độc lập.",element:"Đất",astrology:"Kim Ngưu"},
+  {name:"The Lovers",nameVi:"Người Yêu",number:"VI",suit:"major",keywords:"Tình yêu, Lựa chọn, Hài hòa, Quan hệ",uprightMeaning:"Quan hệ sâu sắc, lựa chọn quan trọng về trái tim.",reversedMeaning:"Bất hòa trong quan hệ, lựa chọn sai lầm.",element:"Không khí",astrology:"Song Tử"},
+  {name:"The Chariot",nameVi:"Cỗ Xe",number:"VII",suit:"major",keywords:"Ý chí, Kiểm soát, Chiến thắng, Quyết tâm",uprightMeaning:"Tiến về phía trước với quyết tâm, vượt qua trở ngại.",reversedMeaning:"Mất kiểm soát, thiếu phương hướng.",element:"Nước",astrology:"Cự Giải"},
+  {name:"Strength",nameVi:"Sức Mạnh",number:"VIII",suit:"major",keywords:"Can đảm, Kiên nhẫn, Lòng trắc ẩn, Tự chủ",uprightMeaning:"Sức mạnh nội tại, kiểm soát cảm xúc bằng lòng trắc ẩn.",reversedMeaning:"Yếu đuối, tự ti, thiếu kỷ luật.",element:"Lửa",astrology:"Sư Tử"},
+  {name:"The Hermit",nameVi:"Ẩn Sĩ",number:"IX",suit:"major",keywords:"Tìm kiếm, Chiêm nghiệm, Hướng dẫn, Cô đơn",uprightMeaning:"Thời gian tự soi xét và tìm kiếm chân lý.",reversedMeaning:"Cô lập quá mức, từ chối lời khuyên.",element:"Đất",astrology:"Xử Nữ"},
+  {name:"Wheel of Fortune",nameVi:"Bánh Xe Vận Mệnh",number:"X",suit:"major",keywords:"Chu kỳ, Số phận, Thay đổi, May mắn",uprightMeaning:"Thay đổi tích cực, chu kỳ mới bắt đầu.",reversedMeaning:"Vận xui, kháng cự thay đổi.",element:"Lửa",astrology:"Sao Mộc"},
+  {name:"Justice",nameVi:"Công Lý",number:"XI",suit:"major",keywords:"Công bằng, Chân lý, Luật pháp, Nhân quả",uprightMeaning:"Quyết định công bằng, chân lý được tiết lộ.",reversedMeaning:"Bất công, thiên vị, tránh trách nhiệm.",element:"Không khí",astrology:"Thiên Bình"},
+  {name:"The Hanged Man",nameVi:"Người Bị Treo",number:"XII",suit:"major",keywords:"Hy sinh, Buông bỏ, Góc nhìn mới, Tạm dừng",uprightMeaning:"Thời gian chờ đợi có ý nghĩa, nhìn từ góc độ khác.",reversedMeaning:"Kháng cự, hy sinh vô ích.",element:"Nước",astrology:"Sao Hải Vương"},
+  {name:"Death",nameVi:"Cái Chết",number:"XIII",suit:"major",keywords:"Kết thúc, Chuyển đổi, Tái sinh, Thay đổi",uprightMeaning:"Kết thúc giai đoạn để bắt đầu mới. Chuyển đổi sâu sắc.",reversedMeaning:"Kháng cự thay đổi, sợ hãi.",element:"Nước",astrology:"Bọ Cạp"},
+  {name:"Temperance",nameVi:"Tiết Độ",number:"XIV",suit:"major",keywords:"Cân bằng, Điều độ, Kiên nhẫn, Hòa hợp",uprightMeaning:"Tìm sự cân bằng và hài hòa trong cuộc sống.",reversedMeaning:"Mất cân bằng, thái quá.",element:"Lửa",astrology:"Nhân Mã"},
+  {name:"The Devil",nameVi:"Ác Quỷ",number:"XV",suit:"major",keywords:"Trói buộc, Nghiện, Vật chất, Mặt tối",uprightMeaning:"Bị trói buộc bởi ham muốn vật chất. Nhận ra những gì kiểm soát bạn.",reversedMeaning:"Giải thoát, vượt qua nghiện ngập.",element:"Đất",astrology:"Ma Kết"},
+  {name:"The Tower",nameVi:"Tòa Tháp",number:"XVI",suit:"major",keywords:"Đảo lộn, Hỗn loạn, Mặc khải, Phá hủy",uprightMeaning:"Thay đổi đột ngột cần thiết. Sau hỗn loạn là tái thiết.",reversedMeaning:"Tránh thảm họa, chống lại thay đổi.",element:"Lửa",astrology:"Sao Hỏa"},
+  {name:"The Star",nameVi:"Ngôi Sao",number:"XVII",suit:"major",keywords:"Hy vọng, Cảm hứng, Bình an, Chữa lành",uprightMeaning:"Hy vọng sau bóng tối, cảm hứng và chữa lành.",reversedMeaning:"Mất niềm tin, thất vọng.",element:"Không khí",astrology:"Bảo Bình"},
+  {name:"The Moon",nameVi:"Mặt Trăng",number:"XVIII",suit:"major",keywords:"Ảo tưởng, Sợ hãi, Tiềm thức, Trực giác",uprightMeaning:"Ảo tưởng và sợ hãi. Tin vào trực giác để điều hướng.",reversedMeaning:"Giải tỏa nỗi sợ, sự thật được tiết lộ.",element:"Nước",astrology:"Song Ngư"},
+  {name:"The Sun",nameVi:"Mặt Trời",number:"XIX",suit:"major",keywords:"Vui vẻ, Thành công, Tích cực, Sức sống",uprightMeaning:"Niềm vui, thành công và năng lượng tích cực.",reversedMeaning:"Tạm thời u ám, chậm trễ trong thành công.",element:"Lửa",astrology:"Mặt trời"},
+  {name:"Judgement",nameVi:"Phán Xét",number:"XX",suit:"major",keywords:"Phản tỉnh, Tha thứ, Tái sinh, Quyết định",uprightMeaning:"Đánh giá lại quá khứ, tha thứ và tiếp tục.",reversedMeaning:"Tự phán xét, không tha thứ.",element:"Lửa",astrology:"Sao Diêm Vương"},
+  {name:"The World",nameVi:"Thế Giới",number:"XXI",suit:"major",keywords:"Hoàn thành, Thành tựu, Du lịch, Trọn vẹn",uprightMeaning:"Hoàn thành chu kỳ, đạt được mục tiêu.",reversedMeaning:"Chưa hoàn thành, thiếu đóng cửa.",element:"Đất",astrology:"Sao Thổ"},
+  {name:"Ace of Wands",nameVi:"Át Gậy",number:"Ace",suit:"wands",keywords:"Khởi đầu, Cảm hứng, Sáng tạo, Tiềm năng",uprightMeaning:"Cơ hội mới đầy cảm hứng, bùng nổ năng lượng sáng tạo.",reversedMeaning:"Thiếu động lực, trì hoãn.",element:"Lửa",astrology:"Bạch Dương, Sư Tử, Nhân Mã"},
+  {name:"Two of Wands",nameVi:"Hai Gậy",number:"2",suit:"wands",keywords:"Lập kế hoạch, Quyết định, Tiến bộ, Khám phá",uprightMeaning:"Lập kế hoạch tương lai, mở rộng tầm nhìn.",reversedMeaning:"Thiếu kế hoạch, sợ thay đổi.",element:"Lửa",astrology:"Sao Hỏa trong Bạch Dương"},
+  {name:"Three of Wands",nameVi:"Ba Gậy",number:"3",suit:"wands",keywords:"Mở rộng, Tầm nhìn xa, Hợp tác, Tiến bộ",uprightMeaning:"Mở rộng phạm vi, nhìn tương lai với hy vọng.",reversedMeaning:"Chậm trễ, thiếu tầm nhìn.",element:"Lửa",astrology:"Mặt trời trong Bạch Dương"},
+  {name:"Four of Wands",nameVi:"Bốn Gậy",number:"4",suit:"wands",keywords:"Ăn mừng, Hài hòa, Nhà cửa, Cộng đồng",uprightMeaning:"Thời gian ăn mừng thành công, hòa hợp gia đình.",reversedMeaning:"Bất hòa, thiếu ổn định.",element:"Lửa",astrology:"Sao Kim trong Bạch Dương"},
+  {name:"Five of Wands",nameVi:"Năm Gậy",number:"5",suit:"wands",keywords:"Xung đột, Cạnh tranh, Căng thẳng, Thử thách",uprightMeaning:"Cạnh tranh và xung đột nhỏ. Học hỏi từ thử thách.",reversedMeaning:"Tránh xung đột, hòa giải.",element:"Lửa",astrology:"Sao Thổ trong Sư Tử"},
+  {name:"Six of Wands",nameVi:"Sáu Gậy",number:"6",suit:"wands",keywords:"Thành công, Công nhận, Tự tin, Chiến thắng",uprightMeaning:"Thành công được công nhận, tự tin và chiến thắng.",reversedMeaning:"Tự cao, thất bại.",element:"Lửa",astrology:"Sao Mộc trong Sư Tử"},
+  {name:"Seven of Wands",nameVi:"Bảy Gậy",number:"7",suit:"wands",keywords:"Bảo vệ, Thử thách, Kiên trì, Lập trường",uprightMeaning:"Bảo vệ vị trí, đối mặt thử thách.",reversedMeaning:"Cảm thấy choáng ngợp, đầu hàng.",element:"Lửa",astrology:"Sao Hỏa trong Sư Tử"},
+  {name:"Eight of Wands",nameVi:"Tám Gậy",number:"8",suit:"wands",keywords:"Tốc độ, Hành động, Tin tức, Du lịch",uprightMeaning:"Mọi thứ diễn ra nhanh, tin tức tốt.",reversedMeaning:"Chậm trễ, thiếu phương hướng.",element:"Lửa",astrology:"Sao Thủy trong Nhân Mã"},
+  {name:"Nine of Wands",nameVi:"Chín Gậy",number:"9",suit:"wands",keywords:"Kiên cường, Bền bỉ, Ranh giới, Phòng thủ",uprightMeaning:"Gần đích nhưng mệt mỏi, cần kiên trì.",reversedMeaning:"Kiệt sức, bỏ cuộc.",element:"Lửa",astrology:"Mặt trăng trong Nhân Mã"},
+  {name:"Ten of Wands",nameVi:"Mười Gậy",number:"10",suit:"wands",keywords:"Gánh nặng, Trách nhiệm, Căng thẳng, Hoàn thành",uprightMeaning:"Gánh nặng trách nhiệm, áp lực hoàn thành.",reversedMeaning:"Giao phó, giảm gánh nặng.",element:"Lửa",astrology:"Sao Thổ trong Nhân Mã"},
+  {name:"Page of Wands",nameVi:"Sứ Giả Gậy",number:"Page",suit:"wands",keywords:"Nhiệt tình, Khám phá, Tin tức, Tò mò",uprightMeaning:"Tin tức hứng thú, cơ hội khám phá mới.",reversedMeaning:"Thiếu phương hướng, tin tức xấu.",element:"Lửa",astrology:"Lửa"},
+  {name:"Knight of Wands",nameVi:"Hiệp Sĩ Gậy",number:"Knight",suit:"wands",keywords:"Hành động, Phiêu lưu, Bốc đồng, Năng lượng",uprightMeaning:"Hành động quyết liệt, phiêu lưu.",reversedMeaning:"Bốc đồng, liều lĩnh.",element:"Lửa",astrology:"Lửa"},
+  {name:"Queen of Wands",nameVi:"Nữ Hoàng Gậy",number:"Queen",suit:"wands",keywords:"Tự tin, Quyến rũ, Độc lập, Xã hội",uprightMeaning:"Tự tin và quyến rũ, lãnh đạo bằng nhiệt huyết.",reversedMeaning:"Ghen tuông, bất an.",element:"Lửa",astrology:"Lửa"},
+  {name:"King of Wands",nameVi:"Vua Gậy",number:"King",suit:"wands",keywords:"Lãnh đạo, Tầm nhìn, Doanh nhân, Vinh dự",uprightMeaning:"Lãnh đạo tự nhiên, tầm nhìn rõ ràng.",reversedMeaning:"Độc đoán, bốc đồng.",element:"Lửa",astrology:"Lửa"},
+  {name:"Ace of Cups",nameVi:"Át Chén",number:"Ace",suit:"cups",keywords:"Tình yêu mới, Cảm xúc, Trực giác, Sáng tạo",uprightMeaning:"Tình yêu mới nở rộ, cảm xúc tích cực tràn đầy.",reversedMeaning:"Cảm xúc bị kìm nén.",element:"Nước",astrology:"Cự Giải, Bọ Cạp, Song Ngư"},
+  {name:"Two of Cups",nameVi:"Hai Chén",number:"2",suit:"cups",keywords:"Đối tác, Kết nối, Hợp nhất, Tình yêu",uprightMeaning:"Quan hệ cân bằng hài hòa, kết nối sâu sắc.",reversedMeaning:"Bất hòa, chia tay.",element:"Nước",astrology:"Sao Kim trong Cự Giải"},
+  {name:"Three of Cups",nameVi:"Ba Chén",number:"3",suit:"cups",keywords:"Ăn mừng, Tình bạn, Cộng đồng, Vui vẻ",uprightMeaning:"Ăn mừng với bạn bè, niềm vui được chia sẻ.",reversedMeaning:"Thừa độ, cô đơn.",element:"Nước",astrology:"Sao Thủy trong Cự Giải"},
+  {name:"Four of Cups",nameVi:"Bốn Chén",number:"4",suit:"cups",keywords:"Trầm ngẫm, Buồn chán, Cơ hội, Nội tâm",uprightMeaning:"Chiêm nghiệm, đánh giá lại. Có thể bỏ lỡ cơ hội.",reversedMeaning:"Thức tỉnh, nhận ra cơ hội.",element:"Nước",astrology:"Mặt trăng trong Cự Giải"},
+  {name:"Five of Cups",nameVi:"Năm Chén",number:"5",suit:"cups",keywords:"Mất mát, Hối tiếc, Thất vọng, Đau buồn",uprightMeaning:"Tập trung vào mất mát, hối tiếc quá khứ.",reversedMeaning:"Chấp nhận, tiếp tục.",element:"Nước",astrology:"Sao Hỏa trong Bọ Cạp"},
+  {name:"Six of Cups",nameVi:"Sáu Chén",number:"6",suit:"cups",keywords:"Hồi ức, Hoài niệm, Quá khứ, Hồn nhiên",uprightMeaning:"Kỷ niệm đẹp về quá khứ, gặp lại người cũ.",reversedMeaning:"Bị mắc kẹt trong quá khứ.",element:"Nước",astrology:"Mặt trời trong Bọ Cạp"},
+  {name:"Seven of Cups",nameVi:"Bảy Chén",number:"7",suit:"cups",keywords:"Lựa chọn, Ảo tưởng, Mơ mộng, Khả năng",uprightMeaning:"Nhiều lựa chọn nhưng không rõ ràng, cần tỉnh táo.",reversedMeaning:"Rõ ràng, quyết định, thực tế.",element:"Nước",astrology:"Sao Kim trong Bọ Cạp"},
+  {name:"Eight of Cups",nameVi:"Tám Chén",number:"8",suit:"cups",keywords:"Rời bỏ, Tìm kiếm, Chuyển đổi, Ý nghĩa",uprightMeaning:"Rời bỏ điều không còn phục vụ, tìm kiếm ý nghĩa sâu hơn.",reversedMeaning:"Sợ thay đổi, bế tắc.",element:"Nước",astrology:"Sao Thổ trong Song Ngư"},
+  {name:"Nine of Cups",nameVi:"Chín Chén",number:"9",suit:"cups",keywords:"Hài lòng, Ước mơ, Thỏa mãn, Niềm vui",uprightMeaning:"Ước mơ thành hiện thực, thỏa mãn và hạnh phúc.",reversedMeaning:"Thất vọng, tự mãn.",element:"Nước",astrology:"Sao Mộc trong Song Ngư"},
+  {name:"Ten of Cups",nameVi:"Mười Chén",number:"10",suit:"cups",keywords:"Hạnh phúc, Gia đình, Hài hòa, Viên mãn",uprightMeaning:"Hạnh phúc gia đình, hài hòa trong quan hệ.",reversedMeaning:"Bất hòa gia đình, mất kết nối.",element:"Nước",astrology:"Sao Hỏa trong Song Ngư"},
+  {name:"Page of Cups",nameVi:"Sứ Giả Chén",number:"Page",suit:"cups",keywords:"Tin tức tốt, Sáng tạo, Trực giác, Hồn nhiên",uprightMeaning:"Tin tức tình cảm, cơ hội sáng tạo.",reversedMeaning:"Cảm xúc chưa chín.",element:"Nước",astrology:"Nước"},
+  {name:"Knight of Cups",nameVi:"Hiệp Sĩ Chén",number:"Knight",suit:"cups",keywords:"Lãng mạn, Quyến rũ, Đề nghị, Lý tưởng",uprightMeaning:"Đề nghị lãng mạn, theo đuổi cảm xúc.",reversedMeaning:"Hứa suông, không thực tế.",element:"Nước",astrology:"Nước"},
+  {name:"Queen of Cups",nameVi:"Nữ Hoàng Chén",number:"Queen",suit:"cups",keywords:"Trực giác, Nhạy cảm, Nuôi dưỡng, Thấu hiểu",uprightMeaning:"Trực giác mạnh, đồng cảm sâu sắc.",reversedMeaning:"Cảm xúc không ổn định.",element:"Nước",astrology:"Nước"},
+  {name:"King of Cups",nameVi:"Vua Chén",number:"King",suit:"cups",keywords:"Cân bằng cảm xúc, Khôn ngoan, Kiểm soát, Đồng cảm",uprightMeaning:"Kiểm soát cảm xúc, khôn ngoan và cân bằng.",reversedMeaning:"Kiểm soát quá mức, lạnh lùng.",element:"Nước",astrology:"Nước"},
+  {name:"Ace of Swords",nameVi:"Át Kiếm",number:"Ace",suit:"swords",keywords:"Rõ ràng, Chân lý, Đột phá, Sức mạnh trí tuệ",uprightMeaning:"Suy nghĩ rõ ràng, đột phá tư duy.",reversedMeaning:"Nhầm lẫn, thiếu rõ ràng.",element:"Không khí",astrology:"Song Tử, Thiên Bình, Bảo Bình"},
+  {name:"Two of Swords",nameVi:"Hai Kiếm",number:"2",suit:"swords",keywords:"Bế tắc, Quyết định khó, Tránh né, Cân bằng",uprightMeaning:"Quyết định khó khăn, tránh đối diện.",reversedMeaning:"Quyết định cuối cùng, thông tin mới.",element:"Không khí",astrology:"Mặt trăng trong Thiên Bình"},
+  {name:"Three of Swords",nameVi:"Ba Kiếm",number:"3",suit:"swords",keywords:"Đau khổ, Mất mát, Chia ly, Buồn bã",uprightMeaning:"Đau lòng, mất mát trong quan hệ.",reversedMeaning:"Chữa lành, tha thứ.",element:"Không khí",astrology:"Sao Thổ trong Thiên Bình"},
+  {name:"Four of Swords",nameVi:"Bốn Kiếm",number:"4",suit:"swords",keywords:"Nghỉ ngơi, Hồi phục, Trầm ngẫm, Tạm dừng",uprightMeaning:"Cần nghỉ ngơi và hồi phục.",reversedMeaning:"Sẵn sàng hành động.",element:"Không khí",astrology:"Sao Mộc trong Thiên Bình"},
+  {name:"Five of Swords",nameVi:"Năm Kiếm",number:"5",suit:"swords",keywords:"Xung đột, Thua cuộc, Bất hòa, Ích kỷ",uprightMeaning:"Thắng lợi rỗng tuếch, xung đột và bất hòa.",reversedMeaning:"Hòa giải, tha thứ.",element:"Không khí",astrology:"Sao Kim trong Bảo Bình"},
+  {name:"Six of Swords",nameVi:"Sáu Kiếm",number:"6",suit:"swords",keywords:"Chuyển đổi, Du lịch, Tiến lên, Chữa lành",uprightMeaning:"Rời bỏ khó khăn, chuyển đến nơi tốt hơn.",reversedMeaning:"Kháng cự thay đổi.",element:"Không khí",astrology:"Sao Thủy trong Bảo Bình"},
+  {name:"Seven of Swords",nameVi:"Bảy Kiếm",number:"7",suit:"swords",keywords:"Lừa dối, Chiến lược, Tránh né, Ngoại giao",uprightMeaning:"Hành động bí mật, chiến lược thông minh.",reversedMeaning:"Sự thật bị phơi bày.",element:"Không khí",astrology:"Mặt trăng trong Bảo Bình"},
+  {name:"Eight of Swords",nameVi:"Tám Kiếm",number:"8",suit:"swords",keywords:"Giới hạn, Nạn nhân, Bế tắc, Sợ hãi",uprightMeaning:"Cảm thấy mắc kẹt, giới hạn tự đặt ra.",reversedMeaning:"Giải phóng, trao quyền.",element:"Không khí",astrology:"Sao Mộc trong Song Tử"},
+  {name:"Nine of Swords",nameVi:"Chín Kiếm",number:"9",suit:"swords",keywords:"Lo lắng, Ác mộng, Sợ hãi, Căng thẳng",uprightMeaning:"Lo lắng quá mức, mất ngủ.",reversedMeaning:"Phục hồi, hy vọng.",element:"Không khí",astrology:"Sao Hỏa trong Song Tử"},
+  {name:"Ten of Swords",nameVi:"Mười Kiếm",number:"10",suit:"swords",keywords:"Kết thúc, Đau khổ, Phản bội, Bắt đầu mới",uprightMeaning:"Kết thúc đau đớn nhưng cần thiết.",reversedMeaning:"Phục hồi, tái sinh.",element:"Không khí",astrology:"Mặt trời trong Song Tử"},
+  {name:"Page of Swords",nameVi:"Sứ Giả Kiếm",number:"Page",suit:"swords",keywords:"Tò mò, Giao tiếp, Tin tức, Cảnh giác",uprightMeaning:"Tò mò và sẵn sàng học, giao tiếp rõ ràng.",reversedMeaning:"Tin đồn, giao tiếp sai.",element:"Không khí",astrology:"Gió"},
+  {name:"Knight of Swords",nameVi:"Hiệp Sĩ Kiếm",number:"Knight",suit:"swords",keywords:"Hành động nhanh, Quyết đoán, Trực tiếp, Tham vọng",uprightMeaning:"Hành động nhanh và quyết đoán.",reversedMeaning:"Vội vàng, hung hãn.",element:"Không khí",astrology:"Gió"},
+  {name:"Queen of Swords",nameVi:"Nữ Hoàng Kiếm",number:"Queen",suit:"swords",keywords:"Rõ ràng, Độc lập, Thẳng thắn, Khách quan",uprightMeaning:"Tư duy rõ ràng và khách quan.",reversedMeaning:"Lạnh lùng, khắt khe.",element:"Không khí",astrology:"Gió"},
+  {name:"King of Swords",nameVi:"Vua Kiếm",number:"King",suit:"swords",keywords:"Trí tuệ, Công lý, Chân lý, Quyền lực trí tuệ",uprightMeaning:"Trí tuệ và công lý, lãnh đạo bằng lý trí.",reversedMeaning:"Lạm dụng quyền lực.",element:"Không khí",astrology:"Gió"},
+  {name:"Ace of Pentacles",nameVi:"Át Tiền",number:"Ace",suit:"pentacles",keywords:"Cơ hội mới, Thịnh vượng, Biểu hiện, Khởi đầu",uprightMeaning:"Cơ hội tài chính mới, khởi đầu thịnh vượng.",reversedMeaning:"Cơ hội bị bỏ lỡ.",element:"Đất",astrology:"Kim Ngưu, Xử Nữ, Ma Kết"},
+  {name:"Two of Pentacles",nameVi:"Hai Tiền",number:"2",suit:"pentacles",keywords:"Cân bằng, Linh hoạt, Ưu tiên, Thích nghi",uprightMeaning:"Cân bằng nhiều trách nhiệm.",reversedMeaning:"Quá tải, mất cân bằng.",element:"Đất",astrology:"Sao Mộc trong Ma Kết"},
+  {name:"Three of Pentacles",nameVi:"Ba Tiền",number:"3",suit:"pentacles",keywords:"Hợp tác, Kỹ năng, Làm việc nhóm, Học hỏi",uprightMeaning:"Làm việc nhóm thành công.",reversedMeaning:"Thiếu làm việc nhóm.",element:"Đất",astrology:"Sao Hỏa trong Ma Kết"},
+  {name:"Four of Pentacles",nameVi:"Bốn Tiền",number:"4",suit:"pentacles",keywords:"Bảo thủ, Kiểm soát, Bảo vệ, Keo kiệt",uprightMeaning:"Bảo vệ tài sản, bảo thủ với tài chính.",reversedMeaning:"Hào phóng, buông bỏ kiểm soát.",element:"Đất",astrology:"Mặt trời trong Ma Kết"},
+  {name:"Five of Pentacles",nameVi:"Năm Tiền",number:"5",suit:"pentacles",keywords:"Khó khăn tài chính, Mất mát, Cô lập, Nghèo khó",uprightMeaning:"Khó khăn tài chính, cần tìm kiếm hỗ trợ.",reversedMeaning:"Phục hồi tài chính.",element:"Đất",astrology:"Sao Thủy trong Kim Ngưu"},
+  {name:"Six of Pentacles",nameVi:"Sáu Tiền",number:"6",suit:"pentacles",keywords:"Hào phóng, Từ thiện, Chia sẻ, Cân bằng",uprightMeaning:"Cho và nhận, từ thiện và hào phóng.",reversedMeaning:"Ích kỷ, nợ nần.",element:"Đất",astrology:"Mặt trăng trong Kim Ngưu"},
+  {name:"Seven of Pentacles",nameVi:"Bảy Tiền",number:"7",suit:"pentacles",keywords:"Kiên nhẫn, Đầu tư dài hạn, Đánh giá, Phần thưởng",uprightMeaning:"Đánh giá tiến độ, kiên nhẫn chờ kết quả.",reversedMeaning:"Thiếu kiên nhẫn.",element:"Đất",astrology:"Sao Thổ trong Kim Ngưu"},
+  {name:"Eight of Pentacles",nameVi:"Tám Tiền",number:"8",suit:"pentacles",keywords:"Thợ thủ công, Kỹ năng, Học tập, Chăm chỉ",uprightMeaning:"Làm việc chăm chỉ, phát triển kỹ năng.",reversedMeaning:"Thiếu động lực.",element:"Đất",astrology:"Mặt trời trong Xử Nữ"},
+  {name:"Nine of Pentacles",nameVi:"Chín Tiền",number:"9",suit:"pentacles",keywords:"Độc lập, Thịnh vượng, Sang trọng, Tự lực",uprightMeaning:"Thành công tài chính qua nỗ lực riêng.",reversedMeaning:"Phụ thuộc tài chính.",element:"Đất",astrology:"Sao Kim trong Xử Nữ"},
+  {name:"Ten of Pentacles",nameVi:"Mười Tiền",number:"10",suit:"pentacles",keywords:"Di sản, Gia đình, Ổn định, Giàu có",uprightMeaning:"Ổn định tài chính lâu dài, di sản gia đình.",reversedMeaning:"Mất ổn định, xung đột gia đình.",element:"Đất",astrology:"Sao Thủy trong Xử Nữ"},
+  {name:"Page of Pentacles",nameVi:"Sứ Giả Tiền",number:"Page",suit:"pentacles",keywords:"Cơ hội, Học tập, Biểu hiện, Thực tế",uprightMeaning:"Cơ hội mới về tài chính hoặc học tập.",reversedMeaning:"Cơ hội bị bỏ lỡ.",element:"Đất",astrology:"Đất"},
+  {name:"Knight of Pentacles",nameVi:"Hiệp Sĩ Tiền",number:"Knight",suit:"pentacles",keywords:"Chăm chỉ, Đáng tin, Kiên định, Thực tế",uprightMeaning:"Tiếp cận thực tế và đáng tin.",reversedMeaning:"Lười biếng, không đáng tin.",element:"Đất",astrology:"Đất"},
+  {name:"Queen of Pentacles",nameVi:"Nữ Hoàng Tiền",number:"Queen",suit:"pentacles",keywords:"Nuôi dưỡng, Thực tế, Dồi dào, Bảo đảm",uprightMeaning:"Nuôi dưỡng thực tế, tạo môi trường ấm áp.",reversedMeaning:"Bỏ bê bản thân.",element:"Đất",astrology:"Đất"},
+  {name:"King of Pentacles",nameVi:"Vua Tiền",number:"King",suit:"pentacles",keywords:"Thịnh vượng, Kinh doanh, Lãnh đạo, Ổn định",uprightMeaning:"Thành công kinh doanh, lãnh đạo tài chính.",reversedMeaning:"Tham lam, thiếu đạo đức.",element:"Đất",astrology:"Đất"},
+];
+
+const suitColors={major:'#7b6ee8',wands:'#e8634c',cups:'#4e9de8',swords:'#8fa0b0',pentacles:'#f4a836'};
+let tarotFilter='all';
+
+function renderTarot(){
+  const q=document.getElementById('tarot-search').value.toLowerCase();
+  const grid=document.getElementById('tarot-grid');
+  const filtered=tarotCards.filter(c=>
+    (tarotFilter==='all'||c.suit===tarotFilter)&&
+    (!q||c.name.toLowerCase().includes(q)||c.nameVi.toLowerCase().includes(q)||c.keywords.toLowerCase().includes(q))
+  );
+  grid.innerHTML=filtered.length?filtered.map(c=>`
+    <div class="card-item ${c.suit}" onclick='openTarotModal(${JSON.stringify(c).replace(/'/g,"&#39;")})'>
+      <div class="card-suit">${c.number}</div>
+      <div class="card-name">${c.name}</div>
+      <div class="card-name-vi">${c.nameVi}</div>
+      <div class="card-keys">${c.keywords}</div>
+    </div>`).join(''):'<div class="empty" style="grid-column:1/-1"><p>Không tìm thấy</p></div>';
+}
+
+function openTarotModal(c){
+  const col=suitColors[c.suit]||'var(--gold)';
+  openModal(`
+    <div class="modal-num" style="color:${col}">${c.number} · ${c.suit==='major'?'Major Arcana':c.suit.charAt(0).toUpperCase()+c.suit.slice(1)}</div>
+    <div class="modal-title">${c.name}</div>
+    <div class="modal-vi" style="color:${col}">${c.nameVi}</div>
+    <div class="modal-keys">${c.keywords}</div>
+    <div class="modal-section"><h4>⬆ Nghĩa xuôi</h4><p>${c.uprightMeaning}</p></div>
+    <div class="modal-section"><h4>⬇ Nghĩa ngược</h4><p>${c.reversedMeaning}</p></div>
+    <div class="modal-meta">
+      <div class="meta-pill">Nguyên tố<span>${c.element}</span></div>
+      <div class="meta-pill">Chiêm tinh<span>${c.astrology}</span></div>
+    </div>`);
+}
+
+document.getElementById('tarot-search').addEventListener('input',renderTarot);
+document.querySelectorAll('#tarot-filters .chip').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#tarot-filters .chip').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');tarotFilter=btn.dataset.tf;renderTarot();
+  });
+});
+
+/* ─ LENORMAND DATA ─ */
+const lenData=[
+  {number:1,name:"Rider",vn:"Người cưỡi ngựa",keywords:"Tin tức, đến và đi, di chuyển",overview:"Tin tức, sự di chuyển và những điều sắp xảy ra.",career:"Tin tức về công việc, cơ hội mới",love:"Một người mới bước vào, sự khởi đầu",health:"Thông tin sức khỏe sẽ sớm đến",timing:"Sớm – 1 ngày, 1 tuần"},
+  {number:2,name:"Clover",vn:"Cỏ bốn lá",keywords:"May mắn, cơ hội ngắn hạn",overview:"Mang lại may mắn bất ngờ, tích cực nhưng ngắn hạn.",career:"Cơ hội nhanh chóng",love:"Niềm vui bất ngờ",health:"Phục hồi sau bệnh",timing:"Đột ngột – 2 ngày"},
+  {number:3,name:"Ship",vn:"Con tàu",keywords:"Du hành, thương mại, nước ngoài",overview:"Biểu thị các chuyến đi và giao thương.",career:"Kinh doanh, xuất nhập khẩu",love:"Tình yêu xa",health:"Khoáng chất",timing:"3 ngày, 3 tuần"},
+  {number:4,name:"House",vn:"Ngôi nhà",keywords:"Gia đình, ổn định, an toàn",overview:"Liên quan đến gia đình và sự ổn định.",career:"Công việc ổn định",love:"Mối quan hệ lâu dài",health:"Ổn định",timing:"4 ngày, 4 tuần"},
+  {number:5,name:"Tree",vn:"Cái cây",keywords:"Sức khỏe, nghiệp, phát triển",overview:"Sức khỏe lâu dài và sự phát triển chậm.",career:"Phát triển cần kiên nhẫn",love:"Tình yêu bền vững",health:"Vấn đề kéo dài",timing:"5 tuần, 5 tháng"},
+  {number:6,name:"Clouds",vn:"Mây mù",keywords:"Mơ hồ, rối rắm",overview:"Sự không chắc chắn và nhiễu loạn.",career:"Bất ổn",love:"Do dự",health:"Căng thẳng, hô hấp",timing:"6 ngày, 6 tuần"},
+  {number:7,name:"Snake",vn:"Con rắn",keywords:"Lừa dối, thao túng",overview:"Ám chỉ phản bội, phức tạp.",career:"Rắc rối nơi làm việc",love:"Tình địch",health:"Cần kiểm tra",timing:"7 ngày, 7 tuần"},
+  {number:8,name:"Coffin",vn:"Quan tài",keywords:"Kết thúc, chuyển hóa",overview:"Đánh dấu sự kết thúc hoặc thay đổi lớn.",career:"Kết thúc dự án",love:"Chia tay",health:"Bệnh tật",timing:"8 ngày, 8 tuần"},
+  {number:9,name:"Bouquet",vn:"Bó hoa",keywords:"Niềm vui, quà tặng",overview:"Mang năng lượng tích cực và hạnh phúc.",career:"Được đánh giá cao",love:"Niềm vui tình cảm",health:"Cải thiện",timing:"9 ngày, 9 tuần"},
+  {number:10,name:"Scythe",vn:"Lưỡi hái",keywords:"Cảnh báo, cắt đứt",overview:"Quyết định nhanh, chấm dứt đột ngột.",career:"Thay đổi nghề nghiệp",love:"Kết thúc mối quan hệ",health:"Phẫu thuật",timing:"Rất nhanh"},
+  {number:11,name:"Whip",vn:"Cây roi",keywords:"Tranh cãi, xung đột",overview:"Mâu thuẫn, tranh luận.",career:"Áp lực công việc",love:"Cãi vã",health:"Đau nhức",timing:"11 ngày"},
+  {number:12,name:"Birds",vn:"Chim",keywords:"Giao tiếp, hội thoại",overview:"Nhiều cuộc trò chuyện, căng thẳng tinh thần.",career:"Phỏng vấn, thương thảo",love:"Hẹn hò",health:"Huyết áp",timing:"12 ngày"},
+  {number:13,name:"Child",vn:"Đứa trẻ",keywords:"Khởi đầu mới, ngây thơ",overview:"Sự mới mẻ và trẻ trung.",career:"Công việc mới",love:"Tình cảm mới",health:"Miễn dịch yếu",timing:"13 ngày"},
+  {number:14,name:"Fox",vn:"Con cáo",keywords:"Công việc, xảo quyệt",overview:"Cảnh báo sự gian trá.",career:"Cẩn trọng nơi làm việc",love:"Lừa dối",health:"Chẩn đoán sai",timing:"14 ngày"},
+  {number:15,name:"Bear",vn:"Con gấu",keywords:"Tài chính, quyền lực",overview:"Sức mạnh, tiền bạc và bảo vệ.",career:"Quản lý, tài chính",love:"Chiếm hữu",health:"Cân nặng",timing:"15 ngày"},
+  {number:16,name:"Stars",vn:"Những vì sao",keywords:"Hy vọng, định hướng",overview:"Niềm tin, cảm hứng và sự rõ ràng.",career:"Mục tiêu rõ ràng",love:"Niềm tin",health:"Tinh thần tốt",timing:"16 ngày"},
+  {number:17,name:"Stork",vn:"Cò",keywords:"Thay đổi, di chuyển",overview:"Sự thay đổi tích cực.",career:"Chuyển việc",love:"Tiến triển",health:"Hồi phục",timing:"17 ngày"},
+  {number:18,name:"Dog",vn:"Con chó",keywords:"Trung thành, bạn bè",overview:"Bạn bè đáng tin cậy.",career:"Hợp tác",love:"Tình bạn",health:"Ổn định",timing:"18 ngày"},
+  {number:19,name:"Tower",vn:"Tòa tháp",keywords:"Cô lập, chính quyền",overview:"Khoảng cách, luật lệ.",career:"Cơ quan nhà nước",love:"Xa cách",health:"Căng thẳng",timing:"19 ngày"},
+  {number:20,name:"Garden",vn:"Khu vườn",keywords:"Xã hội, công chúng",overview:"Các mối quan hệ xã hội.",career:"Sự kiện, mạng lưới",love:"Công khai",health:"Ngoài trời",timing:"20 ngày"},
+  {number:21,name:"Mountain",vn:"Ngọn núi",keywords:"Cản trở, thử thách",overview:"Chướng ngại lớn.",career:"Trì hoãn",love:"Xa cách",health:"Kéo dài",timing:"21 ngày"},
+  {number:22,name:"Crossroad",vn:"Ngã rẽ",keywords:"Lựa chọn, quyết định",overview:"Đứng trước quyết định quan trọng.",career:"Chọn hướng đi",love:"Do dự",health:"Cân nhắc",timing:"22 ngày"},
+  {number:23,name:"Mice",vn:"Chuột",keywords:"Lo âu, hao mòn",overview:"Mất mát dần dần.",career:"Stress",love:"Bất an",health:"Suy nhược",timing:"23 ngày"},
+  {number:24,name:"Heart",vn:"Trái tim",keywords:"Tình yêu, cảm xúc",overview:"Tình cảm chân thành.",career:"Yêu thích công việc",love:"Tình yêu",health:"Tim mạch",timing:"24 ngày"},
+  {number:25,name:"Ring",vn:"Nhẫn",keywords:"Cam kết, hợp đồng",overview:"Ràng buộc và lời hứa.",career:"Hợp đồng",love:"Hôn nhân",health:"Chu kỳ",timing:"25 ngày"},
+  {number:26,name:"Book",vn:"Quyển sách",keywords:"Bí mật, học tập",overview:"Điều chưa được tiết lộ.",career:"Học tập",love:"Bí mật",health:"Chưa rõ",timing:"26 ngày"},
+  {number:27,name:"Letter",vn:"Lá thư",keywords:"Tin nhắn, giấy tờ",overview:"Thông tin bằng văn bản.",career:"Hợp đồng",love:"Tin nhắn",health:"Kết quả xét nghiệm",timing:"27 ngày"},
+  {number:28,name:"Man",vn:"Người đàn ông",keywords:"Nam giới",overview:"Người đàn ông quan trọng.",career:"Đối tác nam",love:"Người yêu",health:"Thể lực",timing:"28 ngày"},
+  {number:29,name:"Woman",vn:"Người phụ nữ",keywords:"Nữ giới",overview:"Người phụ nữ quan trọng.",career:"Đối tác nữ",love:"Người yêu",health:"Nội tiết",timing:"29 ngày"},
+  {number:30,name:"Lily",vn:"Hoa loa kèn",keywords:"Trưởng thành, đạo đức",overview:"Sự chín chắn và công nhận.",career:"Uy tín",love:"Quan hệ sâu sắc",health:"Ổn định",timing:"30 ngày"},
+  {number:31,name:"Sun",vn:"Mặt trời",keywords:"Thành công, năng lượng",overview:"Thành công và tích cực.",career:"Thăng tiến",love:"Hạnh phúc",health:"Sinh lực",timing:"31 ngày"},
+  {number:32,name:"Moon",vn:"Mặt trăng",keywords:"Danh tiếng, cảm xúc",overview:"Sự công nhận và cảm xúc sâu.",career:"Danh tiếng",love:"Lãng mạn",health:"Tâm lý",timing:"32 ngày"},
+  {number:33,name:"Key",vn:"Chìa khóa",keywords:"Giải pháp, chắc chắn",overview:"Câu trả lời quan trọng.",career:"Giải pháp",love:"Quyết định đúng",health:"Chẩn đoán",timing:"33 ngày"},
+  {number:34,name:"Fish",vn:"Cá",keywords:"Tiền bạc, dòng chảy",overview:"Tài chính và sự phong phú.",career:"Thu nhập",love:"Tự do",health:"Trao đổi chất",timing:"34 ngày"},
+  {number:35,name:"Anchor",vn:"Mỏ neo",keywords:"Ổn định, bền vững",overview:"Sự an toàn lâu dài.",career:"Công việc ổn định",love:"Gắn bó",health:"Ổn định",timing:"35 ngày"},
+  {number:36,name:"Cross",vn:"Thánh giá",keywords:"Gánh nặng, định mệnh",overview:"Thử thách mang tính nghiệp quả.",career:"Trách nhiệm",love:"Hy sinh",health:"Stress",timing:"36 ngày"},
+];
+
+function renderLen(){
+  const q=document.getElementById('len-search').value.toLowerCase();
+  const grid=document.getElementById('len-grid');
+  const filtered=lenData.filter(c=>
+    c.name.toLowerCase().includes(q)||c.vn.toLowerCase().includes(q)||String(c.number).includes(q)
+  );
+  grid.innerHTML=filtered.length?filtered.map(c=>`
+    <div class="len-card">
+      <div class="len-badge">#${c.number} — ${c.name}</div>
+      <div class="len-name">${c.vn}</div>
+      <div class="len-vn">${c.keywords}</div>
+      <div class="len-field"><strong>Tổng quan</strong>${c.overview}</div>
+      <div class="len-field"><strong>Sự nghiệp</strong>${c.career}</div>
+      <div class="len-field"><strong>Tình cảm</strong>${c.love}</div>
+      <div class="len-field"><strong>Sức khỏe</strong>${c.health}</div>
+      <div class="len-field"><strong>Thời gian</strong>${c.timing}</div>
+    </div>`).join(''):'<div class="empty"><p>Không tìm thấy</p></div>';
+}
+
+document.getElementById('len-search').addEventListener('input',renderLen);
+
+/* ══ Init theme icon ══ */
+(function(){
+  const t=localStorage.getItem('theme')||'dark';
+  const btn=document.getElementById('theme-btn');
+  if(btn)btn.textContent=t==='dark'?'☀️':'🌙';
+})();
+
+/* ══ Hide loading after Firebase checks ══ */
+setTimeout(()=>{
+  if(document.getElementById('screen-loading').classList.contains('active')){
+    showScreen('login');
+  }
+},5000);
+</script>
+</body>
+</html>
