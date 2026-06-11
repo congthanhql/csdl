@@ -4,162 +4,318 @@
   <meta charset="UTF-8">
   <title>Huỳnh Công Thành | T-Share Groups</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --bg:#f4f6fb;
-      --text:#333;
-      --muted:#666;
-      --card:#ffffff;
-      --shadow:0 4px 12px rgba(0,0,0,0.08);
-      --shadow-hover:0 12px 25px rgba(0,0,0,0.15);
-      --primary1:#667eea;
-      --primary2:#764ba2;
-      --vip:#ff9800;
+    :root {
+      --bg: #f5f0e8;
+      --card: #ffffff;
+      --text: #2a1f0e;
+      --muted: #7a6a55;
+      --gold: #c9962a;
+      --gold-light: #e8b84b;
+      --gold-border: #d4a843;
+      --header-bg: #1a0f00;
+      --section-label: #b8860b;
+      --vip-bg: linear-gradient(135deg, #fffbf0, #fff8e8);
+      --shadow: 0 2px 10px rgba(0,0,0,0.07);
+      --shadow-hover: 0 8px 24px rgba(0,0,0,0.13);
+      --radius: 12px;
     }
 
-    *{box-sizing:border-box;}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
+      font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif;
       background: var(--bg);
       color: var(--text);
+      min-height: 100vh;
     }
 
-    /* ── Login button ── */
-    .login-btn {
-      position: fixed;
-      top: 18px;
-      right: 20px;
-      z-index: 999;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 10px 20px;
-      background: rgba(255,255,255,0.18);
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 50px;
-      text-decoration: none;
-      border: 1.5px solid rgba(255,255,255,0.55);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-      letter-spacing: 0.3px;
-    }
-
-    .login-btn:hover {
-      background: rgba(255,255,255,0.32);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 22px rgba(0,0,0,0.2);
-    }
-
-    .login-btn svg {
-      flex-shrink: 0;
-    }
-
+    /* ── HEADER ── */
     header {
-      background: linear-gradient(135deg, var(--primary1), var(--primary2));
-      color: white;
+      background: var(--header-bg);
       text-align: center;
-      padding: 50px 20px;
+      padding: 36px 20px 28px;
       position: relative;
     }
 
+    .logo-wrap {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #c9962a, #8a5e10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 4px rgba(201,150,42,0.25), 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .logo-wrap svg {
+      width: 40px; height: 40px;
+    }
+
     header h1 {
-      margin: 0;
-      font-size: 36px;
-    }
-
-    header p {
-      margin-top: 10px;
-      font-size: 18px;
-      opacity: 0.9;
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: 30px auto;
-      padding: 20px;
-    }
-
-    .section-title {
-      font-size: 24px;
-      margin: 40px 0 20px;
+      color: var(--gold-light);
+      font-size: 26px;
       font-weight: 700;
-      color: var(--primary2);
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
     }
 
+    header .tagline {
+      color: rgba(255,255,255,0.55);
+      font-size: 13px;
+      font-weight: 400;
+      margin-bottom: 18px;
+    }
+
+    .header-tabs {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .header-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 14px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(201,150,42,0.4);
+      border-radius: 50px;
+      color: rgba(255,255,255,0.82);
+      font-size: 12px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .header-tab:hover {
+      background: rgba(201,150,42,0.18);
+      border-color: var(--gold);
+      color: var(--gold-light);
+    }
+
+    /* ── LOGIN BTN ── */
+    .login-btn {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 999;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: rgba(201,150,42,0.15);
+      color: var(--gold-light);
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 50px;
+      text-decoration: none;
+      border: 1px solid rgba(201,150,42,0.45);
+      backdrop-filter: blur(6px);
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .login-btn:hover {
+      background: rgba(201,150,42,0.3);
+      transform: translateY(-1px);
+    }
+
+    /* ── CONTAINER ── */
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 18px 40px;
+    }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      color: var(--section-label);
+      margin: 36px 0 14px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 14px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(201,150,42,0.2);
+      border-radius: 1px;
+    }
+
+    /* ── GRID ── */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
     }
 
+    .grid-wide {
+      grid-template-columns: 1fr;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+
+    /* ── CARD ── */
     .card {
       background: var(--card);
-      border-radius: 16px;
-      padding: 25px;
+      border-radius: var(--radius);
+      padding: 18px 16px;
       text-align: center;
       text-decoration: none;
       color: var(--text);
       box-shadow: var(--shadow);
-      transition: 0.25s ease;
-      display:block;
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+      display: block;
+      border: 1px solid rgba(0,0,0,0.05);
+      position: relative;
     }
 
     .card:hover {
-      transform: translateY(-6px);
+      transform: translateY(-4px);
       box-shadow: var(--shadow-hover);
     }
 
-    .icon {
-      font-size: 40px;
-      margin-bottom: 12px;
+    /* Info card (horizontal) */
+    .card-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+      padding: 14px 18px;
     }
 
-    .title {
-      font-weight: bold;
-      font-size: 18px;
-      margin-bottom: 8px;
+    .card-info .icon {
+      font-size: 22px;
+      min-width: 36px;
+      text-align: center;
     }
 
-    .desc {
-      font-size: 14px;
+    .card-info .title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .card-info .desc {
+      font-size: 12px;
       color: var(--muted);
     }
 
-    .vip {
-      border: 2px solid var(--vip);
-      background: linear-gradient(135deg, #fff7e6, #fff);
+    /* Default icon card */
+    .icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+      display: block;
     }
 
+    .title {
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 5px;
+      color: var(--text);
+    }
+
+    .desc {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── VIP BADGE ── */
+    .vip-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: linear-gradient(135deg, var(--gold), #a06c10);
+      color: white;
+      font-size: 8px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── VIP CARD ── */
+    .vip {
+      background: var(--vip-bg);
+      border: 1px solid rgba(201,150,42,0.35);
+    }
+
+    .vip .title {
+      color: #7a4f10;
+    }
+
+    /* ── ICON BUBBLE ── */
+    .icon-bubble {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin: 0 auto 10px;
+    }
+
+    .bubble-red    { background: #fff0f0; }
+    .bubble-blue   { background: #f0f4ff; }
+    .bubble-green  { background: #f0fff4; }
+    .bubble-purple { background: #f8f0ff; }
+    .bubble-orange { background: #fff5f0; }
+    .bubble-teal   { background: #f0fffe; }
+    .bubble-yellow { background: #fffbf0; }
+    .bubble-pink   { background: #fff0f8; }
+    .bubble-gold   { background: #fffbea; }
+    .bubble-gray   { background: #f5f5f5; }
+
+    /* ── FOOTER ── */
     footer {
       text-align: center;
-      padding: 25px;
-      color: #888;
-      font-size: 14px;
-      background: #f0f0f0;
-      margin-top: 40px;
+      padding: 20px;
+      color: rgba(255,255,255,0.45);
+      font-size: 12px;
+      background: var(--header-bg);
+      border-top: 1px solid rgba(201,150,42,0.15);
     }
 
-    @media (max-width:600px){
-      header h1{font-size:28px;}
-      header p{font-size:16px;}
+    footer span { color: var(--gold); }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 20px; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
       .login-btn span { display: none; }
-      .login-btn { padding: 10px 14px; }
+      .login-btn { padding: 8px 12px; }
     }
   </style>
 </head>
 
 <body>
 
-<!-- ── Login Button (fixed top-right) ── -->
+<!-- Login -->
 <a href="https://congthanhql.github.io/login/" class="login-btn">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
     <polyline points="10 17 15 12 10 7"/>
     <line x1="15" y1="12" x2="3" y2="12"/>
@@ -167,128 +323,154 @@
   <span>Đăng nhập</span>
 </a>
 
+<!-- HEADER -->
 <header>
-  <h1>🌟 Huỳnh Công Thành</h1>
-  <p>Chủ nhân & Nhà sáng lập T-Share Groups</p>
+  <div class="logo-wrap">
+    <svg viewBox="0 0 40 40" fill="none">
+      <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" font-family="serif">T</text>
+    </svg>
+  </div>
+  <h1>T-Share Trải Bài</h1>
+  <p class="tagline">Khám phá tri thức – Kết nối vận mệnh</p>
+  <div class="header-tabs">
+    <a href="#" class="header-tab">🔥 Làm Đồng</a>
+    <a href="https://congthanhql.github.io/booklichtarot/" class="header-tab">🔮 Tarot &amp; Kinh Dịch</a>
+    <a href="#" class="header-tab">🚀 Công nghệ &amp; Giáo dục</a>
+  </div>
 </header>
 
 <div class="container">
 
   <!-- GIỚI THIỆU -->
   <div class="section-title">👤 Giới thiệu</div>
-  <div class="grid">
-    <div class="card">
-      <div class="icon">📍</div>
-      <div class="title">Địa điểm</div>
-      <div class="desc">Thôn 10, Quảng Tân, Lâm Đồng, Việt Nam</div>
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <div class="card card-info">
+      <span class="icon">📍</span>
+      <div>
+        <div class="title">Địa điểm</div>
+        <div class="desc">Thôn 10, Quảng Tân, Lâm Đồng, Việt Nam</div>
+      </div>
     </div>
-    <div class="card">
-      <div class="icon">🎯</div>
-      <div class="title">Mục tiêu</div>
-      <div class="desc">Phát triển công nghệ & chia sẻ tri thức</div>
+    <div class="card card-info">
+      <span class="icon">🎯</span>
+      <div>
+        <div class="title">Mục tiêu</div>
+        <div class="desc">Phát triển công nghệ &amp; chia sẻ tri thức cộng đồng</div>
+      </div>
     </div>
-    <div class="card">
-      <div class="icon">💡</div>
-      <div class="title">Sở thích</div>
-      <div class="desc">Lập trình, nghiên cứu, sáng tạo nội dung</div>
-     </div>
-    </a>
-    <a href="https://congthanhql.github.io/booklichtarot/" class="card">
-      <div class="icon">📅</div>
-      <div class="title">Đặt Lịch Tarot</div>
-      <div class="desc">Cho nghiên cứu và phát triển cá nhân</div>
-    </a>,
+    <div class="card card-info">
+      <span class="icon">💡</span>
+      <div>
+        <div class="title">Sở thích</div>
+        <div class="desc">Lập trình, nghiên cứu, sáng tạo nội dung số</div>
+      </div>
     </div>
   </div>
 
-  <!-- DỰ ÁN -->
+  <!-- DỰ ÁN CÁ NHÂN -->
   <div class="section-title">🚀 Dự án cá nhân</div>
   <div class="grid">
     <a href="https://www.congthanh.io.vn" class="card">
-      <div class="icon">💻</div>
+      <div class="icon-bubble bubble-blue"><span>💻</span></div>
       <div class="title">Website Cá Nhân</div>
-      <div class="desc">Trang giới thiệu bản thân & portfolio</div>
+      <div class="desc">Portfolio &amp; giới thiệu bản thân</div>
     </a>
-    <a href="https://congthanhql.github.io/t-share/" class="card">
-      <div class="icon">🌐</div>
-      <div class="title">T-Share Trải Bài</div>
-      <div class="desc">Cho nghiên cứu và phát triển cá nhân</div>
+    <a href="#" class="card vip">
+      <span class="vip-badge">VIP</span>
+      <div class="icon-bubble bubble-orange"><span>🎴</span></div>
+      <div class="title">Soi cân - số</div>
+      <div class="desc">Phần mềm cân số cho reader luôn mở có kinh nghiệm, báo giờ không tay xem tổ mở</div>
     </a>
-    <a href="https://congthanhql.github.io/diemthi/" class="card">
-      <div class="icon">🔗</div>
-      <div class="title">QL Điểm Thi</div>
-      <div class="desc">Kết nối & chia sẻ dự án</div>
-   
- </a>
-    <a href="https://congthanhql.github.io/biodrive/" class="card">
-      <div class="icon">🗄️</div>
-      <div class="title">Bio Verify Sever</div>
-      <div class="desc">Trang lưu trữ đám mây dành cho Bio</div>
-    </a>,
-    
-  </div>
-
-  <!-- T-SHARE GROUPS -->
-  <div class="section-title">🏢 T-Share Groups</div>
-  <div class="grid">
     <a href="https://congthanhql.github.io/quanlytask/" class="card vip">
-      <div class="icon">🚀</div>
-      <div class="title">Quản Lý Công Việc</div>
-      <div class="desc">Công ty Cổ phần Dịch vụ T-Share Groups</div>
-</a>
-    <a href="https://congthanhql.github.io/banggia/" class="card vip">
-      <div class="icon">👨‍💻</div>
-      <div class="title">Bảng Giá T-SHare</div>
-      <div class="desc">Công ty Cổ phần Dịch vụ T-Share Groups</div>
-    </a>
-    <a href="https://congthanhql.github.io/luuvideo/" class="card vip">
-      <div class="icon">🎥</div>
-      <div class="title">VIDEO MEMORY</div>
-      <div class="desc">Công ty Cổ phần Dịch vụ T-Share Groups</div>
-    </a>
-  
-    <a href="https://congthanhql.github.io/dethi/" class="card vip">
-      <div class="icon">📑</div>
-      <div class="title">Quản Lý Đề Thi - Pay</div>
-      <div class="desc">Công ty Cổ phần Dịch vụ T-Share Groups</div>
-    </a>
-    <a href="https://congthanhql.github.io/64quekinhdich/" class="card vip">
-      <div class="icon">🌓</div>
-      <div class="title">64 Quẻ Kinh Dịch</div>
-      <div class="desc">Công ty Cổ phần Dịch vụ T-Share Groups</div>
-    </a>
-    
-    <a href="https://congthanhql.github.io/xuathoadon/" class="card vip">
-      <div class="icon">🧰</div>
-      <div class="title">Xuất Hóa Đơn</div>
-      <div class="desc">Các tiện ích & ứng dụng</div>
+      <span class="vip-badge">VIP</span>
+      <div class="icon-bubble bubble-green"><span>🚀</span></div>
+      <div class="title">Quản Lý Task</div>
+      <div class="desc">T-Share Groups</div>
     </a>
     <a href="https://congthanhql.github.io/csdlhoso/" class="card vip">
-      <div class="icon">🔎</div>
+      <span class="vip-badge">VIP</span>
+      <div class="icon-bubble bubble-purple"><span>🔎</span></div>
       <div class="title">CSDL Hồ Sơ</div>
-      <div class="desc">Hệ thống quản lý Hồ Sơ Khách Hàng</div>
+      <div class="desc">Quản lý hồ sơ khách hàng</div>
     </a>
-    <a href="https://congthanhql.github.io/dichvubio/" class="card vip">
-      <div class="icon">👜</div>
-      <div class="title">Dịch Vụ Bio</div>
-      <div class="desc">Các tiện ích & ứng dụng</div>
+    <a href="https://congthanhql.github.io/biodrive/" class="card">
+      <div class="icon-bubble bubble-teal"><span>🗄️</span></div>
+      <div class="title">Bio Verify Server</div>
+      <div class="desc">Lưu trữ đám mây cho Bio</div>
     </a>
+  </div>
+
+  <!-- EDUCATION -->
+  <div class="section-title">📚 Education</div>
+  <div class="grid grid-3">
     <a href="https://congthanhql.github.io/bioverify/" class="card vip">
-      <div class="icon">®️</div>
-      <div class="title">Chiến Dịch 2026 - 2027</div>
-      <div class="desc">Chiến dịch nhằm mục đích kết nối các chủ thể</div>
+      <span class="vip-badge">VIP</span>
+      <div class="icon-bubble bubble-gold"><span>®️</span></div>
+      <div class="title">Chiến Dịch 2026–2027</div>
+      <div class="desc">Kết nối các chủ thể</div>
+    </a>
+    <a href="https://congthanhql.github.io/diemthi/" class="card">
+      <div class="icon-bubble bubble-blue"><span>🔗</span></div>
+      <div class="title">QL Điểm Thi</div>
+      <div class="desc">Kết nối &amp; chia sẻ dự án</div>
+    </a>
+    <a href="https://congthanhql.github.io/dethi/" class="card vip">
+      <span class="vip-badge">VIP</span>
+      <div class="icon-bubble bubble-gray"><span>📑</span></div>
+      <div class="title">Quản Lý Đề Thi – Pay</div>
+      <div class="desc">T-Share Groups</div>
+    </a>
+  </div>
+
+  <!-- GROUPS T-SHARE -->
+  <div class="section-title">🏢 Groups T-Share</div>
+  <div class="grid">
+    <a href="https://congthanhql.github.io/banggia/" class="card vip">
+      <span class="vip-badge">VIP</span>
+      <div class="icon-bubble bubble-red"><span>🧾</span></div>
+      <div class="title">Bảng Giá T-Share</div>
+      <div class="desc">T-Share Groups</div>
+    </a>
+    <a href="https://congthanhql.github.io/booklichtarot/" class="card vip">
+      <span class="vip-badge">VIP</span>
+      <div class="icon-bubble bubble-purple"><span>📅</span></div>
+      <div class="title">Đặt Lịch Tarot</div>
+      <div class="desc">Nghiên cứu &amp; phát triển cá nhân</div>
+    </a>
+    <a href="#" class="card vip">
+      <span class="vip-badge">VIP</span>
+      <div class="icon-bubble bubble-yellow"><span>💡</span></div>
+      <div class="title">Ý Nghĩa Bài</div>
+      <div class="desc">Nghiên cứu &amp; phát triển cá nhân</div>
+    </a>
+    <a href="https://congthanhql.github.io/64quekinhdich/" class="card vip">
+      <span class="vip-badge">VIP</span>
+      <div class="icon-bubble bubble-teal"><span>🌓</span></div>
+      <div class="title">64 Quẻ Kinh Dịch</div>
+      <div class="desc">T-Share Groups</div>
+    </a>
+  </div>
+
+  <!-- HỖ TRỢ & LIÊN HỆ -->
+  <div class="section-title">📞 Hỗ trợ &amp; Liên hệ</div>
+  <div class="grid grid-3">
+    <a href="https://congthanhql.github.io/xuathoadon/" class="card">
+      <div class="icon-bubble bubble-orange"><span>🧰</span></div>
+      <div class="title">Xuất Hóa Đơn</div>
+      <div class="desc">Trang dành cho admin</div>
     </a>
     <a href="https://www.facebook.com/congthanh.bio/" class="card vip">
-      <div class="icon">📞</div>
+      <span class="vip-badge">VIP</span>
+      <div class="icon-bubble bubble-pink"><span>📞</span></div>
       <div class="title">Liên Hệ QTV!</div>
-      <div class="desc">Liên hệ ngay đến quản trị viên để được hỗ trợ!</div>
+      <div class="desc">Hỗ trợ thắc mắc &amp; khó khăn</div>
     </a>
   </div>
 
 </div>
 
 <footer>
-  © 2026 Huỳnh Công Thành | T-Share Groups
+  © 2026 <span>T-Share Trải Bài</span> — Công ty Cổ phần Dịch vụ T-Share Groups
 </footer>
 
 </body>
