@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản Lý Nợ</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --card: #20253a;
+    --border: #2e3450;
+    --accent: #e85d8a;
+    --accent2: #7c5cfc;
+    --green: #22c55e;
+    --red: #ef4444;
+    --text: #e8eaf0;
+    --muted: #8891a8;
+    --label: #b0b8d0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── WELCOME SCREEN ── */
+  #welcome-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 2rem;
+    background: radial-gradient(ellipse at 60% 20%, #1e1040 0%, var(--bg) 70%);
+  }
+
+  .welcome-pin {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    filter: drop-shadow(0 0 24px #e85d8a88);
+  }
+
+  .welcome-title {
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, #e85d8a, #7c5cfc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.75rem;
+  }
+
+  .welcome-sub {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 2.5rem;
+    max-width: 400px;
+    line-height: 1.6;
+  }
+
+  .btn-login {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border: none;
+    padding: 0.85rem 2.5rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s, transform .15s;
+    font-family: inherit;
+  }
+
+  .btn-login:hover { opacity: .88; transform: translateY(-1px); }
+
+  /* ── LOGIN MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #000a;
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    width: min(420px, 95vw);
+  }
+
+  .modal h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+  }
+
+  .field { margin-bottom: 1rem; }
+  .field label { display: block; font-size: .8rem; color: var(--label); margin-bottom: .4rem; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; }
+  .field input, .field select {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .7rem .9rem;
+    color: var(--text);
+    font-size: .95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent2); }
+
+  .modal-actions { display: flex; gap: .75rem; margin-top: 1.5rem; }
+  .btn-primary {
+    flex: 1;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: .75rem;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity .2s;
+  }
+  .btn-primary:hover { opacity: .88; }
+  .btn-cancel {
+    flex: 1;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .75rem;
+    font-size: .95rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color .2s;
+  }
+  .btn-cancel:hover { border-color: var(--label); color: var(--text); }
+
+  .error-msg { color: var(--red); font-size: .85rem; margin-top: .5rem; }
+
+  /* ── MAIN APP ── */
+  #app-screen { display: none; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .header-left { display: flex; align-items: center; gap: .75rem; }
+  .header-logo { font-size: 1.4rem; }
+  .header-title { font-size: 1.1rem; font-weight: 700; }
+  .header-title span { color: var(--accent); }
+
+  .admin-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+    padding: .2rem .6rem;
+    border-radius: 50px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  .btn-logout {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .45rem .9rem;
+    font-size: .82rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s;
+  }
+  .btn-logout:hover { color: var(--red); border-color: var(--red); }
+
+  main { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  /* ── STATS ── */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem 1rem;
+    text-align: center;
+  }
+  .stat-card .val { font-size: 1.5rem; font-weight: 700; }
+  .stat-card .key { font-size: .75rem; color: var(--muted); margin-top: .2rem; text-transform: uppercase; letter-spacing: .05em; }
+  .stat-card.total .val { color: var(--accent); }
+  .stat-card.paid .val { color: var(--green); }
+  .stat-card.unpaid .val { color: var(--red); }
+
+  /* ── ADD FORM ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .section-title { font-size: 1rem; font-weight: 700; color: var(--label); text-transform: uppercase; letter-spacing: .06em; }
+
+  .add-form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr; } }
+
+  .form-grid .full { grid-column: 1 / -1; }
+
+  /* ── LIST ── */
+  .list-header { margin-bottom: .75rem; }
+  .list-controls { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
+  .search-input {
+    flex: 1;
+    min-width: 180px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .6rem .9rem;
+    color: var(--text);
+    font-size: .9rem;
+    font-family: inherit;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--accent2); }
+
+  .filter-select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .6rem .9rem;
+    color: var(--text);
+    font-size: .9rem;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+  }
+
+  /* ── DEBT CARD ── */
+  .debt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: .9rem;
+    cursor: pointer;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .debt-card:hover { border-color: var(--accent2); box-shadow: 0 4px 24px #7c5cfc18; }
+
+  .debt-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+  .debtor-name { font-weight: 700; font-size: 1.05rem; }
+  .buyer-tag { font-size: .78rem; color: var(--muted); margin-top: .15rem; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .3rem .8rem;
+    border-radius: 50px;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    white-space: nowrap;
+  }
+  .badge.paid { background: #16a34a22; color: var(--green); border: 1px solid #16a34a55; }
+  .badge.unpaid { background: #dc262622; color: var(--red); border: 1px solid #dc262655; }
+
+  .debt-card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: .85rem;
+    flex-wrap: wrap;
+    gap: .5rem;
+  }
+  .debt-amount { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
+  .debt-date { font-size: .8rem; color: var(--muted); }
+
+  /* ── DETAIL MODAL ── */
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem 1.4rem; margin-bottom: 1.5rem; }
+  @media (max-width: 480px) { .detail-grid { grid-template-columns: 1fr; } }
+  .detail-row { }
+  .detail-label { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .2rem; }
+  .detail-value { font-size: .98rem; font-weight: 600; color: var(--text); }
+
+  .status-section { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+  .status-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; }
+  .status-label { font-size: .85rem; color: var(--label); font-weight: 500; }
+
+  .toggle-paid {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .55rem 1.1rem;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--text);
+    transition: all .2s;
+  }
+  .toggle-paid:hover { border-color: var(--green); color: var(--green); }
+  .toggle-paid.mark-unpaid:hover { border-color: var(--red); color: var(--red); }
+
+  .admin-only-note { font-size: .75rem; color: var(--muted); margin-top: .5rem; }
+
+  .delete-btn {
+    background: transparent;
+    border: 1px solid #dc262644;
+    color: var(--red);
+    border-radius: 8px;
+    padding: .55rem 1.1rem;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s;
+  }
+  .delete-btn:hover { background: #dc262618; }
+
+  .btn-actions { display: flex; gap: .65rem; flex-wrap: wrap; margin-top: 1.25rem; }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--muted);
+  }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; opacity: .5; }
+
+  .loading { text-align: center; padding: 3rem; color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<!-- WELCOME / GUEST SCREEN -->
+<div id="welcome-screen">
+  <div class="welcome-pin">📍</div>
+  <h1 class="welcome-title">Chào mừng bạn đến với<br>Trang Quản Lý Nợ</h1>
+  <p class="welcome-sub">Hệ thống theo dõi công nợ dành riêng cho quản trị viên. Vui lòng đăng nhập để truy cập dữ liệu.</p>
+  <button class="btn-login" onclick="openLoginModal()">🔐 Đăng nhập</button>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal">
+    <h2>🔐 Đăng nhập Admin</h2>
+    <div class="field">
+      <label>Gmail</label>
+      <input type="email" id="login-email" placeholder="admin@example.com" />
+    </div>
+    <div class="field">
+      <label>Mật khẩu</label>
+      <input type="password" id="login-pass" placeholder="••••••••" />
+    </div>
+    <div class="error-msg" id="login-error"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeLoginModal()">Hủy</button>
+      <button class="btn-primary" onclick="doLogin()">Đăng nhập</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-screen">
+  <header>
+    <div class="header-left">
+      <span class="header-logo">📍</span>
+      <span class="header-title">Quản Lý <span>Nợ</span></span>
+      <span class="admin-badge" id="admin-badge" style="display:none">Admin</span>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">Đăng xuất</button>
+  </header>
+
+  <main>
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat-card total">
+        <div class="val" id="stat-total">0</div>
+        <div class="key">Tổng khoản nợ</div>
+      </div>
+      <div class="stat-card paid">
+        <div class="val" id="stat-paid">0</div>
+        <div class="key">Đã Thanh Toán</div>
+      </div>
+      <div class="stat-card unpaid">
+        <div class="val" id="stat-unpaid">0</div>
+        <div class="key">Chưa Thanh Toán</div>
+      </div>
+    </div>
+
+    <!-- ADD FORM (admin only) -->
+    <div id="add-form-wrap" style="display:none">
+      <div class="section-header">
+        <span class="section-title">➕ Thêm khoản nợ mới</span>
+      </div>
+      <div class="add-form-card">
+        <div class="form-grid">
+          <div class="field">
+            <label>Họ và Tên người nợ</label>
+            <input type="text" id="f-name" placeholder="Nguyễn Văn A" />
+          </div>
+          <div class="field">
+            <label>Người mua / Chủ nợ</label>
+            <input type="text" id="f-buyer" placeholder="Tên chủ nợ" />
+          </div>
+          <div class="field">
+            <label>Ngày nợ</label>
+            <input type="date" id="f-date" />
+          </div>
+          <div class="field">
+            <label>Số tiền nợ (VNĐ)</label>
+            <input type="number" id="f-amount" placeholder="500000" />
+          </div>
+          <div class="field full">
+            <label>Ghi chú</label>
+            <input type="text" id="f-note" placeholder="Mặt hàng, lý do..." />
+          </div>
+        </div>
+        <div style="margin-top:1rem">
+          <button class="btn-primary" onclick="addDebt()" style="max-width:200px">Lưu khoản nợ</button>
+        </div>
+        <div class="error-msg" id="form-error"></div>
+      </div>
+    </div>
+
+    <!-- LIST -->
+    <div class="section-header">
+      <span class="section-title">📋 Danh sách công nợ</span>
+    </div>
+    <div class="list-controls" style="margin-bottom:1rem">
+      <input class="search-input" id="search-box" type="text" placeholder="🔍 Tìm theo tên người nợ..." oninput="renderList()" />
+      <select class="filter-select" id="filter-status" onchange="renderList()">
+        <option value="">Tất cả</option>
+        <option value="unpaid">Chưa trả</option>
+        <option value="paid">Đã trả</option>
+      </select>
+    </div>
+
+    <div id="debt-list"><div class="loading">Đang tải dữ liệu…</div></div>
+  </main>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal" style="max-width:500px">
+    <h2 style="margin-bottom:1.25rem">📄 Chi tiết khoản nợ</h2>
+    <div class="detail-grid" id="detail-content"></div>
+    <div class="status-section">
+      <div class="status-row">
+        <div>
+          <div class="status-label">Trạng thái thanh toán</div>
+          <div id="detail-status-badge" style="margin-top:.4rem"></div>
+        </div>
+        <div id="admin-toggle-wrap"></div>
+      </div>
+    </div>
+    <div class="btn-actions">
+      <button class="btn-cancel" onclick="closeDetailModal()" style="flex:1">Đóng</button>
+      <button class="delete-btn" id="delete-btn" onclick="deleteCurrentDebt()">🗑 Xóa</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getDatabase, ref, push, set, onValue, remove, update }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDtAU-Iqn-u39_mgkxRZ3fIF_Kyxqn-Gyg",
+    authDomain: "csdl-bio.firebaseapp.com",
+    databaseURL: "https://csdl-bio-default-rtdb.firebaseio.com",
+    projectId: "csdl-bio",
+    storageBucket: "csdl-bio.firebasestorage.app",
+    messagingSenderId: "568258817515",
+    appId: "1:568258817515:web:c000fa072fb096eaa63dae",
+    measurementId: "G-0MSWDNTLJ8"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+
+  const ADMIN_EMAIL = "bioverify@googlegroups.com";
+
+  let currentUser = null;
+  let isAdmin = false;
+  let allDebts = [];
+  let currentDebtId = null;
+
+  // ── AUTH STATE ──
+  onAuthStateChanged(auth, user => {
+    currentUser = user;
+    isAdmin = user && user.email === ADMIN_EMAIL;
+    if (user) {
+      document.getElementById('welcome-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display = 'block';
+      document.getElementById('admin-badge').style.display = isAdmin ? 'inline-flex' : 'none';
+      document.getElementById('add-form-wrap').style.display = isAdmin ? 'block' : 'none';
+      document.getElementById('delete-btn').style.display = isAdmin ? '' : 'none';
+      loadDebts();
+    } else {
+      document.getElementById('welcome-screen').style.display = 'flex';
+      document.getElementById('app-screen').style.display = 'none';
+    }
+  });
+
+  // ── LOGIN ──
+  window.openLoginModal = () => {
+    document.getElementById('login-modal').classList.add('open');
+    document.getElementById('login-error').textContent = '';
+  };
+  window.closeLoginModal = () => document.getElementById('login-modal').classList.remove('open');
+
+  window.doLogin = async () => {
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-pass').value;
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+      closeLoginModal();
+    } catch(e) {
+      document.getElementById('login-error').textContent = 'Email hoặc mật khẩu không đúng.';
+    }
+  };
+
+  window.doLogout = () => signOut(auth);
+
+  // ── LOAD DEBTS ──
+  function loadDebts() {
+    const dbRef = ref(db, 'debts');
+    onValue(dbRef, snap => {
+      allDebts = [];
+      if (snap.exists()) {
+        snap.forEach(child => {
+          allDebts.push({ id: child.key, ...child.val() });
+        });
+        allDebts.sort((a,b) => new Date(b.date) - new Date(a.date));
+      }
+      updateStats();
+      renderList();
+    });
+  }
+
+  // ── STATS ──
+  function updateStats() {
+    const total  = allDebts.length;
+    const paid   = allDebts.filter(d => d.paid).length;
+    const unpaid = total - paid;
+    document.getElementById('stat-total').textContent  = total;
+    document.getElementById('stat-paid').textContent   = paid;
+    document.getElementById('stat-unpaid').textContent = unpaid;
+  }
+
+  // ── RENDER LIST ──
+  window.renderList = () => {
+    const q      = document.getElementById('search-box').value.toLowerCase();
+    const filter = document.getElementById('filter-status').value;
+    let list = allDebts.filter(d => {
+      const matchName = d.name.toLowerCase().includes(q);
+      const matchStatus = filter === '' ? true : (filter === 'paid' ? d.paid : !d.paid);
+      return matchName && matchStatus;
+    });
+
+    const container = document.getElementById('debt-list');
+    if (!list.length) {
+      container.innerHTML = `<div class="empty-state"><div class="icon">💸</div>Không có khoản nợ nào.</div>`;
+      return;
+    }
+
+    container.innerHTML = list.map(d => `
+      <div class="debt-card" onclick="openDetail('${d.id}')">
+        <div class="debt-card-top">
+          <div>
+            <div class="debtor-name">${d.name}</div>
+            <div class="buyer-tag">👤 Chủ nợ: ${d.buyer || '—'}</div>
+          </div>
+          ${d.paid
+            ? `<span class="badge paid">✅ Đã Thanh Toán</span>`
+            : `<span class="badge unpaid">❌ Error – Chưa Trả</span>`}
+        </div>
+        <div class="debt-card-bottom">
+          <div class="debt-amount">${formatMoney(d.amount)} ₫</div>
+          <div class="debt-date">📅 ${formatDate(d.date)}</div>
+        </div>
+      </div>
+    `).join('');
+  };
+
+  // ── ADD DEBT ──
+  window.addDebt = async () => {
+    if (!isAdmin) return;
+    const name   = document.getElementById('f-name').value.trim();
+    const buyer  = document.getElementById('f-buyer').value.trim();
+    const date   = document.getElementById('f-date').value;
+    const amount = parseFloat(document.getElementById('f-amount').value);
+    const note   = document.getElementById('f-note').value.trim();
+
+    if (!name || !date || !amount) {
+      document.getElementById('form-error').textContent = 'Vui lòng điền đầy đủ: Tên, Ngày, Số tiền.';
+      return;
+    }
+    document.getElementById('form-error').textContent = '';
+
+    const dbRef = ref(db, 'debts');
+    await push(dbRef, { name, buyer, date, amount, note, paid: false, createdAt: Date.now() });
+
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-buyer').value = '';
+    document.getElementById('f-date').value = '';
+    document.getElementById('f-amount').value = '';
+    document.getElementById('f-note').value = '';
+  };
+
+  // ── DETAIL ──
+  window.openDetail = id => {
+    const d = allDebts.find(x => x.id === id);
+    if (!d) return;
+    currentDebtId = id;
+
+    document.getElementById('detail-content').innerHTML = `
+      <div class="detail-row"><div class="detail-label">Họ và Tên người nợ</div><div class="detail-value">${d.name}</div></div>
+      <div class="detail-row"><div class="detail-label">Chủ nợ / Người mua</div><div class="detail-value">${d.buyer || '—'}</div></div>
+      <div class="detail-row"><div class="detail-label">Ngày nợ</div><div class="detail-value">📅 ${formatDate(d.date)}</div></div>
+      <div class="detail-row"><div class="detail-label">Số tiền nợ</div><div class="detail-value" style="color:var(--accent)">${formatMoney(d.amount)} ₫</div></div>
+      ${d.note ? `<div class="detail-row" style="grid-column:1/-1"><div class="detail-label">Ghi chú</div><div class="detail-value">${d.note}</div></div>` : ''}
+    `;
+
+    const badge = d.paid
+      ? `<span class="badge paid">✅ Đã Thanh Toán</span>`
+      : `<span class="badge unpaid">❌ Error – Chưa Trả</span>`;
+    document.getElementById('detail-status-badge').innerHTML = badge;
+
+    const toggleWrap = document.getElementById('admin-toggle-wrap');
+    if (isAdmin) {
+      toggleWrap.innerHTML = d.paid
+        ? `<button class="toggle-paid mark-unpaid" onclick="togglePaid('${id}', false)">Đánh dấu chưa trả</button>`
+        : `<button class="toggle-paid" onclick="togglePaid('${id}', true)">✅ Xác nhận đã trả</button>`;
+    } else {
+      toggleWrap.innerHTML = `<span class="admin-only-note">Chỉ admin mới đổi trạng thái</span>`;
+    }
+
+    document.getElementById('detail-modal').classList.add('open');
+  };
+
+  window.closeDetailModal = () => {
+    document.getElementById('detail-modal').classList.remove('open');
+    currentDebtId = null;
+  };
+
+  window.togglePaid = async (id, val) => {
+    if (!isAdmin) return;
+    await update(ref(db, `debts/${id}`), { paid: val });
+    closeDetailModal();
+  };
+
+  window.deleteCurrentDebt = async () => {
+    if (!isAdmin || !currentDebtId) return;
+    if (!confirm('Xóa khoản nợ này?')) return;
+    await remove(ref(db, `debts/${currentDebtId}`));
+    closeDetailModal();
+  };
+
+  // ── UTILS ──
+  function formatMoney(n) {
+    return Number(n).toLocaleString('vi-VN');
+  }
+  function formatDate(str) {
+    if (!str) return '—';
+    const [y,m,d] = str.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  // close modals on overlay click
+  document.getElementById('login-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeLoginModal();
+  });
+  document.getElementById('detail-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeDetailModal();
+  });
+
+  // enter key login
+  document.getElementById('login-pass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.doLogin();
+  });
+</script>
+</body>
+</html>
