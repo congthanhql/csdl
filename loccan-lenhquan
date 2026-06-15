@@ -186,10 +186,29 @@
   .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .badge { background: rgba(200,146,42,.12); border: 1px solid rgba(200,146,42,.3); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: var(--gold-lt); }
 
+  /* card bài */
+  .cards-row { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
+  .playing-card {
+    background: linear-gradient(145deg, #fff9f0, #ffe8c0);
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    min-width: 48px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .playing-card.black { color: #1a1208; }
+  .playing-card.red   { color: #c0392b; }
+
   /* loc grid */
   .loc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
   .loc-box { background: rgba(255,255,255,.04); border-radius: 8px; padding: 12px 14px; }
   .loc-box h4 { color: var(--gold); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+  .loc-box ul { list-style: none; }
+  .loc-box ul li { font-size: 13px; color: var(--parch-dk); padding: 2px 0; }
 
   /* strength/weakness */
   .sw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -203,6 +222,13 @@
   .sw-card ul li { font-size: 13px; color: var(--parch-dk); padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
   .sw-card ul li:last-child { border-bottom: none; }
 
+  /* do tri */
+  .dotri-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+  .dotri-row { display: flex; align-items: flex-start; gap: 14px; background: rgba(255,255,255,.03); border: 1px solid rgba(200,146,42,.12); border-radius: 10px; padding: 12px 16px; }
+  .dotri-rank { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold); opacity: .6; flex-shrink: 0; line-height: 1.2; }
+  .dotri-body strong { font-family: 'Playfair Display', serif; color: var(--gold-lt); font-size: 14px; display: block; }
+  .dotri-body span { font-size: 12px; color: var(--smoke); }
+
   /* summary */
   .sum-grid { display: grid; gap: 8px; }
   .sum-row { display: grid; grid-template-columns: 155px 1fr; gap: 10px; align-items: start; background: rgba(255,255,255,.03); border: 1px solid rgba(200,146,42,.12); border-radius: 10px; padding: 12px 16px; }
@@ -210,17 +236,28 @@
   .sum-val { color: var(--gold-lt); font-weight: 600; font-family: 'Playfair Display', serif; font-size: 14px; }
   .sum-val small { display: block; font-family: 'Inter', sans-serif; font-weight: 400; font-size: 11px; color: var(--smoke); margin-top: 2px; }
 
+  /* dau hieu */
+  .sign-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .sign-box { background: rgba(255,255,255,.04); border: 1px solid rgba(200,146,42,.12); border-radius: 8px; padding: 12px 14px; }
+  .sign-box h4 { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .sign-box ul { list-style: none; }
+  .sign-box ul li { font-size: 13px; color: var(--parch-dk); padding: 2px 0; }
+
   /* final quote */
   .final-quote { margin: 32px 0 0; background: linear-gradient(135deg, rgba(200,146,42,.1) 0%, rgba(122,62,12,.08) 100%); border: 1px solid rgba(200,146,42,.25); border-radius: 14px; padding: 22px 26px; text-align: center; }
   .final-quote blockquote { font-family: 'Playfair Display', serif; font-style: italic; font-size: 15px; color: var(--gold-lt); line-height: 1.8; }
   .final-quote cite { display: block; margin-top: 10px; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--smoke); font-style: normal; }
   .disclaimer { text-align: center; font-size: 11px; color: var(--smoke); margin-top: 20px; padding: 0 20px; line-height: 1.6; }
 
+  /* highlight note */
+  .note-box { background: rgba(200,146,42,.07); border: 1px solid rgba(200,146,42,.2); border-radius: 8px; padding: 10px 14px; margin-top: 10px; font-size: 13px; color: var(--gold-lt); font-style: italic; }
+
   @media (max-width: 500px) {
     .id-card { grid-template-columns: 1fr; }
     .sum-row { grid-template-columns: 1fr; }
     .loc-grid { grid-template-columns: 1fr; }
     .sw-grid  { grid-template-columns: 1fr; }
+    .sign-grid { grid-template-columns: 1fr; }
     .login-card { padding: 36px 24px 32px; }
     .topbar { flex-direction: column; gap: 10px; align-items: flex-start; }
   }
@@ -297,173 +334,258 @@
   <!-- Identity card -->
   <div class="identity">
     <div class="id-card">
-      <div class="id-field"><label>Giới tính</label><strong>Nam mệnh</strong></div>
+      <div class="id-field"><label>Họ và tên</label><strong>Huỳnh Công Thành</strong></div>
+      <div class="id-field"><label>Giới tính</label><strong>Nam mệnh – Canh Dần</strong></div>
       <div class="id-field"><label>Ngày sinh dương lịch</label><strong>02 / 02 / 2010</strong></div>
       <div class="id-field"><label>Ngày sinh âm lịch</label><strong>19 / 12 / 2009</strong></div>
       <div class="id-field"><label>Giờ sinh</label><strong>12:45 – Giờ Ngọ</strong></div>
+      <div class="id-field"><label>Bộ bài trải</label><strong>3 hàng · 9 lá</strong></div>
     </div>
   </div>
 
   <main>
 
-    <!-- I -->
+    <!-- I: Hàng 1 – Gia Tiên -->
     <section>
-      <div class="sec-header"><div class="sec-num">I</div><div class="sec-title">Tổng Khí Bộ Bài</div><div class="sec-rule"></div></div>
+      <div class="sec-header"><div class="sec-num">I</div><div class="sec-title">Hàng 1 – Gia Tiên</div><div class="sec-rule"></div></div>
       <div class="card">
-        <p>Bộ bài mang đặc trưng rõ của hệ 52 lá quy chiếu Tứ Phủ:</p>
-        <ul>
-          <li>Lá <strong>K (Già)</strong> chủ quyền lệnh xuất hiện nổi bật</li>
-          <li>Lá <strong>A (Át)</strong> đi kèm K tạo thế căn dẫn đường</li>
-          <li><strong>Song Long (5 bích)</strong> hỗ trợ khí hàng Quan</li>
-          <li>Lá <strong>Q (Đầm)</strong> xuất hiện trợ căn</li>
-          <li><strong>Bích và Rô cân bằng</strong> – vừa có thử thách, vừa có lộc</li>
+        <p style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--smoke);margin-bottom:10px;">Lá bài xuất hiện</p>
+        <div class="cards-row">
+          <div class="playing-card black">6 ♠<br/><span style="font-size:10px;font-weight:400;">Bích</span></div>
+          <div class="playing-card black">J ♣<br/><span style="font-size:10px;font-weight:400;">Chuồn</span></div>
+          <div class="playing-card red">10 ♦<br/><span style="font-size:10px;font-weight:400;">Rô</span></div>
+        </div>
+        <p style="margin-top:14px;"><strong>6 Bích</strong> – Kết nối cội nguồn, dòng họ; chuyện trong tộc họ còn ảnh hưởng đến hậu duệ. Có người đã khuất từ phía họ nội đang theo dõi và giữ gìn.</p>
+        <p style="margin-top:8px;"><strong>J Chuồn</strong> – Người nam trẻ tuổi, người dẫn đường, đứng giữa kết nối hai phía. Có thể là người mất khi chưa cao tuổi hoặc người nam có vai trò quan trọng trong họ.</p>
+        <p style="margin-top:8px;"><strong>10 Rô</strong> – Tài lộc, phúc phần và tích lũy. Gia tiên có phúc khí, không phải dòng họ yếu.</p>
+        <div class="note-box">
+          ✦ Gia tiên đang <strong>nâng đỡ</strong> chứ không phá, không ngăn trở. Dòng họ còn phúc khí. Khi gặp nạn lớn luôn có sự che chở đúng lúc. Không cần cúng lớn – điều quan trọng là lòng thành tưởng nhớ vào ngày giỗ, Tết.
+        </div>
+        <ul style="margin-top:12px;">
+          <li>Có người nam trong gia tiên hoặc họ nội đang độ trì</li>
+          <li>Dòng họ có 2–3 người từng làm thầy – yếu tố tâm linh trong tộc</li>
+          <li>Âm phần nâng đỡ nhẹ nhàng, không đòi hỏi nặng</li>
+          <li>Gặp khó khăn thường có người xuất hiện giúp đúng lúc</li>
+          <li>Nhắc: lo học hành, công việc trước – đừng sa đà chuyện thị phi</li>
         </ul>
-        <p style="margin-top:10px;color:var(--gold-lt);font-style:italic;">→ Đây là bộ bài của người có duyên và sợi dây liên kết thực với cửa Thánh.</p>
       </div>
     </section>
 
-    <!-- II -->
+    <!-- II: Hàng 2 – Căn Số Bản Mệnh -->
     <section>
-      <div class="sec-header"><div class="sec-num">II</div><div class="sec-title">Căn Chính</div><div class="sec-rule"></div></div>
+      <div class="sec-header"><div class="sec-num">II</div><div class="sec-title">Hàng 2 – Căn Số & Bản Mệnh</div><div class="sec-rule"></div></div>
       <div class="card">
-        <p class="hl">⚔ Quan Hoàng Bảy Bảo Hà</p>
-        <p>Mức độ nghiêng: <strong style="color:var(--green);">70 – 80%</strong></p>
+        <p style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--smoke);margin-bottom:10px;">Lá bài xuất hiện – Điểm nổi bật nhất toàn bộ trải bài</p>
+        <div class="cards-row">
+          <div class="playing-card red">K ♥<br/><span style="font-size:10px;font-weight:400;">Cơ</span></div>
+          <div class="playing-card black">K ♣<br/><span style="font-size:10px;font-weight:400;">Chuồn</span></div>
+          <div class="playing-card black">K ♠<br/><span style="font-size:10px;font-weight:400;">Bích</span></div>
+        </div>
+
+        <p class="hl" style="margin-top:16px;">⚔ Ba lá K liên tiếp – Tổ hợp hiếm gặp</p>
+        <p style="margin-top:6px;">Trong dân gian, bộ ba K xuất hiện cùng lúc ở hàng căn số là dấu hiệu đặc biệt:</p>
         <ul>
-          <li>K chủ quyền lệnh nổi – dấu hiệu "cửa Quan" mạnh</li>
-          <li>Song Long hỗ trợ khí hàng Quan Hoàng</li>
-          <li>A đi cùng K tạo thế người có căn dẫn đường</li>
-          <li>Không nghiêng mạnh về Sơn Trang hay Thoải Phủ</li>
+          <li><strong>K Cơ</strong> – Hàng Quan, năng lượng lãnh đạo, dẫn dắt</li>
+          <li><strong>K Chuồn</strong> – Võ cách, hành động mạnh, thực thi quyết đoán</li>
+          <li><strong>K Bích</strong> – Bảo hộ, quản việc, khí Thoải Phủ, liên hệ nước</li>
+        </ul>
+
+        <p class="hl" style="margin-top:16px;">⚔ Căn Chính: Quan Đệ Tam Thoải Phủ</p>
+        <p>Nổi bật nhất trong hàng Quan dựa trên toàn bộ dấu hiệu:</p>
+        <ul>
+          <li>K Bích – khí Thoải Phủ, cửa nước nổi trội</li>
+          <li>Đương số từng suýt đuối nước – duyên nước rõ</li>
+          <li>Có nhiều lần thoát nạn lớn – được bảo hộ mạnh</li>
+          <li>Trực giác và linh cảm tốt – đặc trưng cửa Quan lớn</li>
         </ul>
         <div class="badge-row">
-          <span class="badge">🗣 Duyên giao tiếp</span>
-          <span class="badge">🤝 Duyên khách khứa</span>
-          <span class="badge">💬 Duyên lời nói</span>
+          <span class="badge">🌊 Duyên nước – Thoải Phủ</span>
+          <span class="badge">⚔ Khí Quan mạnh</span>
+          <span class="badge">🧭 Duyên dẫn đường</span>
+          <span class="badge">🔮 Lộc cảm ứng</span>
+        </div>
+
+        <p class="hl" style="margin-top:16px;">🌿 Duyên Phụ: Sơn Trang – Thượng Ngàn</p>
+        <ul>
+          <li>Mơ rừng núi, sơn lâm liên tục nhiều năm</li>
+          <li>Mơ sơn trang, mơ rắn hổ mang kéo dài</li>
+          <li>Nghiêng về khí Cô Bé Thượng Ngàn và Mẫu Thượng Ngàn</li>
+        </ul>
+
+        <p class="hl" style="margin-top:16px;">🔑 Code tính cách – Canh Dần, giờ Ngọ</p>
+        <div class="sign-grid">
+          <div class="sign-box">
+            <h4>Tính cách cốt lõi</h4>
+            <ul>
+              <li>Cứng cỏi, có chính kiến</li>
+              <li>Thích tự quyết, không thích bị ép</li>
+              <li>Đã tin ai thì tin rất sâu</li>
+              <li>Mất niềm tin rất khó lấy lại</li>
+            </ul>
+          </div>
+          <div class="sign-box">
+            <h4>Khả năng đặc biệt</h4>
+            <ul>
+              <li>Nhạy cảm với cảm xúc người khác</li>
+              <li>Đọc tâm lý khá tốt</li>
+              <li>Xem việc, xem bói thường sát</li>
+              <li>Tìm hiểu huyền bí, tâm linh</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- III -->
+    <!-- III: Hàng 3 – Hiện Tại & Tương Lai -->
     <section>
-      <div class="sec-header"><div class="sec-num">III</div><div class="sec-title">Quan Cầm Bản Mệnh</div><div class="sec-rule"></div></div>
+      <div class="sec-header"><div class="sec-num">III</div><div class="sec-title">Hàng 3 – Hiện Tại & Tương Lai Gần</div><div class="sec-rule"></div></div>
       <div class="card">
-        <p class="hl">⚔ Quan Hoàng Bảy Bảo Hà</p>
-        <p>Thường được độ khi:</p>
-        <ul>
-          <li>Soi bài, tiếp khách</li>
-          <li>Giúp người khác tháo gỡ bế tắc</li>
-          <li>Làm việc thông qua lời nói và kết nối</li>
-        </ul>
+        <p style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--smoke);margin-bottom:10px;">Lá bài xuất hiện</p>
+        <div class="cards-row">
+          <div class="playing-card black">5 ♣<br/><span style="font-size:10px;font-weight:400;">Chuồn</span></div>
+          <div class="playing-card black">Q ♠<br/><span style="font-size:10px;font-weight:400;">Bích</span></div>
+          <div class="playing-card red">K ♦<br/><span style="font-size:10px;font-weight:400;">Rô</span></div>
+        </div>
+
+        <p style="margin-top:14px;"><strong>5 Chuồn</strong> – Hiện tại còn dao động. Công việc hoặc định hướng chưa hoàn toàn ổn định. Đang trong giai đoạn chuyển hướng, chưa chốt được con đường rõ ràng.</p>
+        <p style="margin-top:8px;"><strong>Q Bích</strong> – Xuất hiện bóng nữ trợ lực. Người nữ lớn tuổi hơn hoặc có ảnh hưởng tinh thần. Lá này cũng cho thấy trực giác của đương số đang tăng lên. Có thể là người thầy hoặc người dẫn đường nữ.</p>
+        <p style="margin-top:8px;"><strong>K Rô</strong> – Kết quả tốt. Đạt được vị thế tốt hơn hiện tại. Có cơ hội về tài chính hoặc uy tín cá nhân. Dễ được người khác tin tưởng. Quyền quản cuối cùng vẫn thuộc hàng nam thần.</p>
+        <div class="note-box">
+          ✦ Trong vài tháng tới: xu hướng tốt lên về công việc, tài chính và danh tiếng cá nhân. Có người nữ đóng vai trò hỗ trợ hoặc dẫn đường. Giai đoạn hiện tại là chuyển tiếp – không bền mãi ở trạng thái dao động.
+        </div>
       </div>
     </section>
 
-    <!-- IV -->
+    <!-- IV: Dấu Hiệu Căn -->
     <section>
-      <div class="sec-header"><div class="sec-num">IV</div><div class="sec-title">Quan Trợ Lực</div><div class="sec-rule"></div></div>
+      <div class="sec-header"><div class="sec-num">IV</div><div class="sec-title">Dấu Hiệu Căn Đã Xuất Hiện</div><div class="sec-rule"></div></div>
       <div class="card">
-        <p class="hl">⚔ Quan Đệ Ngũ Tuần Tranh</p>
-        <p>Vị đứng phía sau trợ lực, không phải chủ căn:</p>
-        <ul>
-          <li>Khi gặp khó khăn có người mở đường</li>
-          <li>Tưởng bế tắc lại có hướng giải quyết</li>
-          <li>Trợ lực mạnh khi làm việc tâm linh</li>
-        </ul>
+        <div class="sign-grid">
+          <div class="sign-box">
+            <h4>🌙 Tâm linh</h4>
+            <ul>
+              <li>Từ 10–14 tuổi bắt đầu mơ nhiều</li>
+              <li>Mơ rắn hổ mang nhiều năm</li>
+              <li>Mơ bị rắn đuổi</li>
+              <li>Có thấy người âm</li>
+              <li>Linh cảm mạnh từ nhỏ</li>
+              <li>Mộng báo ứng nghiệm nhiều lần</li>
+            </ul>
+          </div>
+          <div class="sign-box">
+            <h4>🌊 Cuộc sống</h4>
+            <ul>
+              <li>Từng suýt đuối nước</li>
+              <li>Thoát tai nạn giao thông nghiêm trọng</li>
+              <li>Nhiều lần thoát nạn lớn</li>
+              <li>Đọc tâm lý người khác tốt</li>
+              <li>Xem việc thường khá sát</li>
+            </ul>
+          </div>
+          <div class="sign-box">
+            <h4>🏔 Giấc mơ nổi bật</h4>
+            <ul>
+              <li>Rừng núi, sơn lâm</li>
+              <li>Sơn trang</li>
+              <li>Rắn hổ mang</li>
+              <li>Sông nước</li>
+            </ul>
+          </div>
+          <div class="sign-box">
+            <h4>👨‍👩‍👦 Dòng họ</h4>
+            <ul>
+              <li>2–3 người từng làm thầy</li>
+              <li>Yếu tố tâm linh trong tộc</li>
+              <li>Gia tiên theo độ</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- V -->
+    <!-- V: Độ Trì -->
     <section>
-      <div class="sec-header"><div class="sec-num">V</div><div class="sec-title">Hàng Cô Trợ Căn</div><div class="sec-rule"></div></div>
+      <div class="sec-header"><div class="sec-num">V</div><div class="sec-title">Thứ Tự Độ Trì & Ban Phước</div><div class="sec-rule"></div></div>
       <div class="card">
-        <p class="hl">🌸 Cô Chín Sòng Sơn <em style="font-size:12px;color:var(--smoke);font-style:normal;">(chính)</em></p>
-        <ul>
-          <li>Mở duyên, mở lộc xem bài</li>
-          <li>Tăng trực giác, giúp kết nối với khách</li>
-          <li>Có khả năng nói trúng điều người đang nghĩ</li>
-        </ul>
-        <p class="hl" style="margin-top:14px;">🌸 Cô Bé Thượng Ngàn <em style="font-size:12px;color:var(--smoke);font-style:normal;">(phụ)</em></p>
-        <ul>
-          <li>Bảo hộ, giữ sự bình an</li>
-          <li>Giữ tâm trong công việc tâm linh</li>
-        </ul>
+        <div class="dotri-list">
+          <div class="dotri-row">
+            <div class="dotri-rank">①</div>
+            <div class="dotri-body">
+              <strong>🏮 Gia Tiên</strong>
+              <span>Gốc căn – Độ trì mạnh nhất. Che chở khi gặp nạn, mở đường khi bế tắc. Dòng họ có phúc khí, âm phần nâng đỡ nhẹ nhàng. Không đòi hỏi nặng.</span>
+            </div>
+          </div>
+          <div class="dotri-row">
+            <div class="dotri-rank">②</div>
+            <div class="dotri-body">
+              <strong>⚔ Quan Đệ Tam Thoải Phủ</strong>
+              <span>Căn chính – Quan lớn cầm bản mệnh. Bảo hộ trực tiếp, độ trì khi gặp nạn lớn (đặc biệt liên quan nước). Mở lộc cảm ứng và lộc xem việc.</span>
+            </div>
+          </div>
+          <div class="dotri-row">
+            <div class="dotri-rank">③</div>
+            <div class="dotri-body">
+              <strong>🌿 Sơn Trang – Mẫu Thượng Ngàn</strong>
+              <span>Duyên phụ – Biểu hiện qua mộng rừng núi, sơn trang và rắn nhiều năm. Cô Bé Thượng Ngàn giữ tâm, bảo hộ bình an trong công việc.</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- VI -->
+    <!-- VI: Lộc -->
     <section>
-      <div class="sec-header"><div class="sec-num">VI</div><div class="sec-title">Lộc Soi – Lộc Bói</div><div class="sec-rule"></div></div>
+      <div class="sec-header"><div class="sec-num">VI</div><div class="sec-title">Lộc Soi – Lộc Bói – Lộc Cảm Ứng</div><div class="sec-rule"></div></div>
       <div class="card">
         <p class="hl" style="color:var(--green);font-size:17px;">✔ Có Lộc</p>
         <div class="loc-grid">
           <div class="loc-box">
-            <h4>Lộc Cảm</h4>
-            <ul class="card ul">
-              <li style="padding-left:0;color:var(--parch-dk);font-size:13px;">Dễ cảm nhận khi nhìn người</li>
-              <li style="padding-left:0;color:var(--parch-dk);font-size:13px;">Dễ đoán tâm trạng</li>
-              <li style="padding-left:0;color:var(--parch-dk);font-size:13px;">Trực giác nhạy bén</li>
+            <h4>Lộc Cảm Ứng</h4>
+            <ul>
+              <li>Linh cảm mạnh, trực giác nhạy bén</li>
+              <li>Nhìn người, đọc tâm lý khá chuẩn</li>
+              <li>Mộng báo thường ứng nghiệm</li>
+              <li>Dễ cảm nhận khi nhìn người</li>
             </ul>
           </div>
           <div class="loc-box">
-            <h4>Lộc Bài</h4>
+            <h4>Lộc Xem Việc</h4>
             <ul>
-              <li style="padding-left:0;color:var(--parch-dk);font-size:13px;">Có sự liên kết khi trải bài</li>
-              <li style="padding-left:0;color:var(--parch-dk);font-size:13px;">Nói trúng điều người đang nghĩ</li>
-              <li style="padding-left:0;color:var(--parch-dk);font-size:13px;">Khách hữu duyên tự tìm đến</li>
+              <li>Xem việc, xem bói thường khá sát</li>
+              <li>Lộc mở dần – gia tiên mở trước</li>
+              <li>Sau đó Quan Đệ Tam tiếp nối</li>
+              <li>Khách hữu duyên tự tìm đến</li>
             </ul>
           </div>
         </div>
-        <p style="margin-top:12px;font-size:12px;color:var(--smoke);">Chủ lộc: Quan Hoàng Bảy · Trợ lộc: Cô Chín Sòng Sơn · Có gia tiên nâng đỡ</p>
+        <p style="margin-top:12px;font-size:12px;color:var(--smoke);">Thứ tự mở lộc: Gia tiên → Quan Đệ Tam → Sơn Trang · Khách thường hỏi tình cảm, công việc, gia đạo</p>
       </div>
     </section>
 
-    <!-- VII -->
+    <!-- VII: Điểm Mạnh & Chú Ý -->
     <section>
-      <div class="sec-header"><div class="sec-num">VII</div><div class="sec-title">Đường Khách & Tài Lộc</div><div class="sec-rule"></div></div>
-      <div class="card">
-        <ul>
-          <li>Có khách cũ quay lại nhiều lần</li>
-          <li>Có khách được giới thiệu – người hữu duyên tự tìm đến</li>
-          <li>Giai đoạn đầu đông vắng không đều; càng làm lâu càng bền lộc</li>
-          <li>Khách thường hỏi về <strong>tình cảm, công việc, gia đạo</strong></li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- VIII -->
-    <section>
-      <div class="sec-header"><div class="sec-num">VIII</div><div class="sec-title">Gia Tiên & Lính Ghế</div><div class="sec-rule"></div></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="card">
-          <p style="color:var(--gold);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">🏮 Gia Tiên</p>
-          <ul><li>Có âm phúc che chở</li><li>Không đòi hỏi nặng</li><li>Âm phần nâng đỡ nhẹ nhàng</li></ul>
-        </div>
-        <div class="card">
-          <p style="color:var(--gold);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">⚔ Lính Ghế</p>
-          <ul><li>Có lính ghế, có người hầu</li><li>Số lượng không đông</li><li>Trợ việc dẫn duyên, dẫn khách</li></ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- IX -->
-    <section>
-      <div class="sec-header"><div class="sec-num">IX</div><div class="sec-title">Điểm Mạnh & Cần Chú Ý</div><div class="sec-rule"></div></div>
+      <div class="sec-header"><div class="sec-num">VII</div><div class="sec-title">Điểm Mạnh & Cần Chú Ý</div><div class="sec-rule"></div></div>
       <div class="sw-grid">
         <div class="sw-card str">
           <h4>✦ Điểm mạnh</h4>
           <ul>
-            <li>Trực giác tốt, nhạy cảm</li>
+            <li>Ý chí mạnh, khó nghe lời khi đã quyết</li>
+            <li>Trực giác tốt, nhạy cảm tự nhiên</li>
             <li>Dễ tạo niềm tin khi nói chuyện</li>
-            <li>Có khả năng an ủi người khác</li>
-            <li>Duyên giao tiếp rộng</li>
-            <li>Lộc mở dần theo thời gian</li>
+            <li>Đọc tâm lý người khác tốt</li>
+            <li>Xem việc thường khá sát</li>
+            <li>Duyên quý nhân nam giúp đỡ</li>
+            <li>Lộc mở dần – càng làm lâu càng bền</li>
           </ul>
         </div>
         <div class="sw-card wk">
           <h4>✦ Cần chú ý</h4>
           <ul>
-            <li>Dễ suy nghĩ nhiều, tâm tư</li>
-            <li>Dễ bị ảnh hưởng cảm xúc khách</li>
-            <li>Xem quá nhiều dễ mệt năng lượng</li>
-            <li>Cần giữ tâm ổn định</li>
+            <li>Đã mất niềm tin rất khó lấy lại</li>
+            <li>Dễ bị ảnh hưởng cảm xúc người khác</li>
+            <li>Có thể sa đà chuyện thị phi</li>
+            <li>Giai đoạn hiện tại còn dao động</li>
+            <li>Cần giữ uy tín để bền lộc</li>
           </ul>
         </div>
       </div>
@@ -471,26 +593,30 @@
 
     <!-- SUMMARY -->
     <section>
-      <div class="sec-header"><div class="sec-num">✦</div><div class="sec-title">Tổng Hợp Bản Luận</div><div class="sec-rule"></div></div>
+      <div class="sec-header"><div class="sec-num">✦</div><div class="sec-title">Tổng Hợp – Bản Trình Đồng Thầy</div><div class="sec-rule"></div></div>
       <div class="sum-grid">
-        <div class="sum-row"><span class="sum-label">Căn chính</span><span class="sum-val">Quan Hoàng Bảy <small>Bảo Hà</small></span></div>
-        <div class="sum-row"><span class="sum-label">Cầm bản mệnh</span><span class="sum-val">Quan Hoàng Bảy <small>Chủ quản đường căn và đường lộc</small></span></div>
-        <div class="sum-row"><span class="sum-label">Quan trợ lực</span><span class="sum-val">Quan Đệ Ngũ Tuần Tranh <small>Đứng phía sau hỗ trợ</small></span></div>
-        <div class="sum-row"><span class="sum-label">Cô trợ lộc</span><span class="sum-val">Cô Chín Sòng Sơn <small>Mở duyên · Mở lộc soi · Mở lộc bói</small></span></div>
-        <div class="sum-row"><span class="sum-label">Gia tiên</span><span class="sum-val">Có âm phúc nâng đỡ <small>Không nặng, nhẹ nhàng bảo hộ</small></span></div>
-        <div class="sum-row"><span class="sum-label">Lính ghế</span><span class="sum-val">Có <small>Không đông · Trợ việc dẫn duyên dẫn khách</small></span></div>
-        <div class="sum-row"><span class="sum-label">Lộc</span><span class="sum-val">Lộc soi · Lộc bói · Lộc xem bài <small>Mở dần theo thời gian</small></span></div>
-        <div class="sum-row"><span class="sum-label">Hướng phát triển</span><span class="sum-val">Xem bài · Tư vấn · Chia sẻ tâm linh <small>Càng giữ uy tín càng bền lộc</small></span></div>
+        <div class="sum-row"><span class="sum-label">Họ tên</span><span class="sum-val">Huỳnh Công Thành <small>Nam – Canh Dần · Giờ Ngọ · 02/02/2010</small></span></div>
+        <div class="sum-row"><span class="sum-label">Gốc căn</span><span class="sum-val">Gia Tiên <small>Dòng họ có người làm thầy · Âm phần độ trì mạnh nhất</small></span></div>
+        <div class="sum-row"><span class="sum-label">Cửa căn chính</span><span class="sum-val">Hàng Quan <small>Bộ ba K nổi bật trong hàng căn số</small></span></div>
+        <div class="sum-row"><span class="sum-label">Quan cầm bản mệnh</span><span class="sum-val">Quan Đệ Tam Thoải Phủ <small>K Bích nổi · duyên nước · thoát nạn nhiều lần</small></span></div>
+        <div class="sum-row"><span class="sum-label">Duyên phụ</span><span class="sum-val">Sơn Trang – Thượng Ngàn <small>Mộng rừng núi, sơn trang, rắn hổ mang nhiều năm</small></span></div>
+        <div class="sum-row"><span class="sum-label">Thứ tự độ trì</span><span class="sum-val">Gia Tiên → Quan Đệ Tam → Sơn Trang <small>Gia tiên là nền tảng chính</small></span></div>
+        <div class="sum-row"><span class="sum-label">Lộc</span><span class="sum-val">Lộc cảm ứng · Lộc xem việc · Lộc bói <small>Mở dần – gia tiên mở trước</small></span></div>
+        <div class="sum-row"><span class="sum-label">Hiện tại</span><span class="sum-val">Đang trong giai đoạn chuyển đổi <small>Chưa ổn định · Có bóng nữ trợ lực</small></span></div>
+        <div class="sum-row"><span class="sum-label">Tương lai gần</span><span class="sum-val">Tốt lên về công việc & uy tín <small>K Rô kết – đạt vị thế tốt hơn · được tin tưởng</small></span></div>
       </div>
     </section>
 
     <div class="final-quote">
       <blockquote>
-        "Nam mệnh này có căn cửa Quan, Quan Hoàng Bảy cầm bản mệnh,<br/>
-        Quan Đệ Ngũ trợ lực, Cô Chín Sòng Sơn mở duyên mở lộc,<br/>
-        có lộc soi lộc bói và có duyên làm nghề xem bài."
+        "Gốc căn gia tiên. Cửa căn hàng Quan. Quan nổi nhất là Quan Đệ Tam Thoải Phủ.<br/>
+        Có duyên Sơn Trang – Thượng Ngàn do mộng rắn, sơn lâm, rừng núi xuất hiện nhiều năm.<br/>
+        Có lộc cảm ứng, linh cảm và xem việc khá sát.<br/>
+        Gia tiên độ trì là chính, Quan Đệ Tam trợ lực, Sơn Trang là duyên phụ.<br/>
+        Theo riêng trải bài thì khí Quan mạnh hơn khí Cô,<br/>
+        và Quan Đệ Tam là hướng nổi bật nhất trong toàn bộ lá bài."
       </blockquote>
-      <cite>— Bản luận theo hệ bài 52 lá quy chiếu Tam – Tứ Phủ</cite>
+      <cite>— Bản luận theo hệ bài 52 lá quy chiếu Tam – Tứ Phủ · Tổng kết trình đồng thầy</cite>
     </div>
 
     <p class="disclaimer">
@@ -520,17 +646,14 @@
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // toggle password
   document.getElementById('togglePw').addEventListener('click', () => {
     const pw = document.getElementById('password');
     pw.type = pw.type === 'password' ? 'text' : 'password';
   });
 
-  // enter key
   document.getElementById('email').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('password').focus(); });
   document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-  // auth state
   onAuthStateChanged(auth, user => {
     if (user) showMain(user.email);
     else showLogin();
@@ -555,8 +678,7 @@
   function clearErrors() {
     ['emailErr','passErr'].forEach(id => document.getElementById(id).classList.remove('show'));
     ['email','password'].forEach(id => document.getElementById(id).classList.remove('err-input'));
-    const a = document.getElementById('alertErr');
-    a.classList.remove('show');
+    document.getElementById('alertErr').classList.remove('show');
   }
 
   function errMsg(code) {
