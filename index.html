@@ -2,9 +2,34 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Huỳnh Công Thành | T-Share Groups</title>
+  <title>T-Share App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- ── PWA / HOME SCREEN ── -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="T-Share App">
+  <meta name="application-name" content="T-Share App">
+  <meta name="theme-color" content="#1a0f00">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- Apple Touch Icon – inline base64 của logo T-Share (Safari đọc thẻ này) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="T-Share.jpg">
+  <link rel="apple-touch-icon" href="T-Share.jpg">
+  <link rel="icon" type="image/jpeg" href="T-Share.jpg">
+
+  <!-- Manifest inline qua data URI – không cần file riêng -->
+  <link rel="manifest" href="data:application/manifest+json,{
+    %22name%22:%22T-Share App%22,
+    %22short_name%22:%22T-Share App%22,
+    %22description%22:%22T-Share Tr%E1%BA%A3i B%C3%A0i %E2%80%93 Kh%C3%A1m ph%C3%A1 tri th%E1%BB%A9c%2C K%E1%BA%BFt n%E1%BB%91i v%E1%BA%ADn m%E1%BB%87nh%22,
+    %22start_url%22:%22./%22,
+    %22display%22:%22standalone%22,
+    %22background_color%22:%22%231a0f00%22,
+    %22theme_color%22:%22%231a0f00%22,
+    %22icons%22:[{%22src%22:%22T-Share.jpg%22,%22sizes%22:%22512x512%22,%22type%22:%22image/jpeg%22}]
+  }">
 
   <style>
     :root {
@@ -41,19 +66,20 @@
     }
 
     .logo-wrap {
-      width: 72px;
-      height: 72px;
+      width: 80px;
+      height: 80px;
       margin: 0 auto 14px;
       border-radius: 50%;
-      background: linear-gradient(145deg, #c9962a, #8a5e10);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 0 4px rgba(201,150,42,0.25), 0 4px 20px rgba(0,0,0,0.5);
+      overflow: hidden;
+      box-shadow: 0 0 0 4px rgba(201,150,42,0.35), 0 4px 20px rgba(0,0,0,0.6);
+      border: 2px solid rgba(201,150,42,0.5);
     }
 
-    .logo-wrap svg {
-      width: 40px; height: 40px;
+    .logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     header h1 {
@@ -151,6 +177,7 @@
       height: 2px;
       background: var(--gold);
       border-radius: 2px;
+      flex-shrink: 0;
     }
 
     .section-title::after {
@@ -166,10 +193,6 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 12px;
-    }
-
-    .grid-wide {
-      grid-template-columns: 1fr;
     }
 
     .grid-3 {
@@ -326,9 +349,7 @@
 <!-- HEADER -->
 <header>
   <div class="logo-wrap">
-    <svg viewBox="0 0 40 40" fill="none">
-      <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" font-family="serif">T</text>
-    </svg>
+    <img src="T-Share.jpg" alt="T-Share Logo">
   </div>
   <h1>T-Share Trải Bài</h1>
   <p class="tagline">Khám phá tri thức – Kết nối vận mệnh</p>
@@ -375,6 +396,12 @@
       <div class="title">Website Cá Nhân</div>
       <div class="desc">Portfolio &amp; giới thiệu bản thân</div>
     </a>
+    <div class="grid">
+    <a href="https://sites.google.com/view/tsharetraibai/" class="card">
+      <div class="icon-bubble bubble-blue"><span>💎</span></div>
+      <div class="title">T-SHARE</div>
+      <div class="desc">Portfolio &amp; giới thiệu bản thân</div>
+    </a>
     <a href="https://congthanhql.github.io/soicanbaitay" class="card vip">
       <span class="vip-badge">VIP</span>
       <div class="icon-bubble bubble-orange"><span>🎴</span></div>
@@ -392,7 +419,7 @@
       <div class="icon-bubble bubble-purple"><span>🔎</span></div>
       <div class="title">CSDL Hồ Sơ</div>
       <div class="desc">Quản lý hồ sơ khách hàng</div>
- </a>
+    </a>
     <a href="https://congthanhql.github.io/canso-lenhquan/" class="card vip">
       <span class="vip-badge">CỜ THÁNH</span>
       <div class="icon-bubble bubble-green"><span>🚩</span></div>
@@ -405,7 +432,6 @@
       <div class="title">Đánh giá dịch vụ</div>
       <div class="desc">Đánh giá bổ sung ý kiến cho T-SHARE</div>
     </a>
-    
     <a href="https://congthanhql.github.io/biodrive/" class="card">
       <div class="icon-bubble bubble-teal"><span>🗄️</span></div>
       <div class="title">Bio Verify Server</div>
